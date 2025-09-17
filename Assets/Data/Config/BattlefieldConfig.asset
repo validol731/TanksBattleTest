@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54b01874b18bf814da3c3992e4b81e43, type: 3}
+  m_Name: BattlefieldConfig
+  m_EditorClassIdentifier: 
+  fieldSize: {x: 15, y: 15}
+  enemyAmount: 0
+  moveIntervalMin: 1.5
+  moveIntervalMax: 2
+  "move\u0421ruiseSpeed": 2.5
+  respawnDelay: 1
+  playerTankPrefab: {fileID: 5947381835198154081, guid: 8560c414b3c52354cb5c8101cefb2f9b, type: 3}
+  playerConfig: {fileID: 11400000, guid: b25348273cd6dd74fa7992309f88913e, type: 2}
+  enemyTankPrefab: {fileID: 5947381835198154081, guid: c4dfb8c32d6ae2548bb7228063a00eea, type: 3}
+  enemyConfigs:
+  - {fileID: 11400000, guid: 394dc1df3aa117045ab64d8a1212c540, type: 2}

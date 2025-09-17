@@ -11,10 +11,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Bullet
+  - Wall
+  - Player
+  - Enemy
   - 
   - 
   - 
@@ -40,4 +40,16 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 469256079
+    locked: 0
+  - name: Walls
+    uniqueID: 448630403
+    locked: 0
+  - name: Tank
+    uniqueID: 3328136383
+    locked: 0
+  - name: Bullet
+    uniqueID: 3347683211
     locked: 0
