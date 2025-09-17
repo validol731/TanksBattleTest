@@ -93,7 +93,7 @@ namespace Features.Spawning
                 EnemyAIHost host = enemy.gameObject.AddComponent<EnemyAIHost>();
                 _resolver.Inject(host);
 
-                Vector2 center = _battlefieldConfig.fieldSize * 0.5f;
+                Vector2 center = _battlefieldConfig.MapCenter;
                 Vector2 toCenter = (center - position).normalized;
                 float headingDegrees = Mathf.Atan2(toCenter.y, toCenter.x) * Mathf.Rad2Deg;
                 enemy.transform.rotation = Quaternion.Euler(0f, 0f, headingDegrees);

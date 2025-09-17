@@ -9,7 +9,7 @@ namespace Configs
     public class BattlefieldConfig : ScriptableObject
     {
         [Header("Map Setup")]
-        [SerializeField] public Vector2 fieldSize= new(16,16);
+        [SerializeField] private Vector2 fieldSize= new(16,16);
 
         [Header("General")]
         [SerializeField] public int enemyAmount = 4;
@@ -25,5 +25,13 @@ namespace Configs
         
         [SerializeField] public Tank enemyTankPrefab;
         [SerializeField] public List<TankConfig> enemyConfigs = new List<TankConfig>();
+        
+        
+        public Vector2 MapCenter => Vector2.zero;
+        
+        public Vector2 MapMin => new Vector2(-MapWidth * 0.5f, -MapHeight * 0.5f);
+        public Vector2 MapMax => new Vector2(MapWidth * 0.5f, MapHeight * 0.5f);
+        public float MapWidth => fieldSize.x;
+        public float MapHeight => fieldSize.y;
     }
 }

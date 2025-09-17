@@ -16,27 +16,28 @@ namespace Features.Spawning
 
         public Vector2 RandomBorderPoint()
         {
-            Vector2 min = -(_battlefieldConfig.fieldSize * 0.5f);
-            Vector2 max = _battlefieldConfig.fieldSize * 0.5f;
+            Vector2 min = _battlefieldConfig.MapMin;
+            Vector2 max = _battlefieldConfig.MapMax;
+            float inset = 0.64f;
 
             int edgeIndex = Random.Range(0, 4);
             Vector2 point = Vector2.zero;
 
-            if (edgeIndex == 0)
+            if (edgeIndex == 0) // left
             {
-                point = new Vector2(min.x, Random.Range(min.y, max.y));
+                point = new Vector2(min.x + inset, Random.Range(min.y + inset, max.y - inset));
             }
-            else if (edgeIndex == 1)
+            else if (edgeIndex == 1) // right
             {
-                point = new Vector2(max.x, Random.Range(min.y, max.y));
+                point = new Vector2(max.x - inset, Random.Range(min.y + inset, max.y - inset));
             }
-            else if (edgeIndex == 2)
+            else if (edgeIndex == 2) // bottom
             {
-                point = new Vector2(Random.Range(min.x, max.x), min.y);
+                point = new Vector2(Random.Range(min.x + inset, max.x - inset), min.y + inset);
             }
-            else
+            else // top
             {
-                point = new Vector2(Random.Range(min.x, max.x), max.y);
+                point = new Vector2(Random.Range(min.x + inset, max.x - inset), max.y - inset);
             }
 
             return point;
@@ -44,26 +45,28 @@ namespace Features.Spawning
 
         public Vector2 CornerByIndex(int index)
         {
-            Vector2 min = -(_battlefieldConfig.fieldSize * 0.5f);
-            Vector2 max = _battlefieldConfig.fieldSize * 0.5f;
+            Vector2 min = _battlefieldConfig.MapMin;
+            Vector2 max = _battlefieldConfig.MapMax;
+            float inset = 0.64f;
 
             if (index == 0)
             {
-                return new Vector2(min.x, min.y);
+                return new Vector2(min.x + inset, min.y + inset);
             }
             else if (index == 1)
             {
-                return new Vector2(max.x, min.y);
+                return new Vector2(max.x - inset, min.y + inset);
             }
             else if (index == 2)
             {
-                return new Vector2(min.x, max.y);
+                return new Vector2(min.x + inset, max.y - inset);
             }
             else
             {
-                return new Vector2(max.x, max.y);
+                return new Vector2(max.x - inset, max.y - inset);
             }
         }
+
 
         public async UniTaskVoid RespawnAfterDelay(Tank tank, Vector2 position)
         {

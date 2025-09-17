@@ -34,8 +34,8 @@ namespace Features.AI
         {
             _aiController.Setup(_tank.Movement, _battlefieldConfig, _rigidbody2D);
 
-            Observable.EveryUpdate()
-                .Subscribe(_ => _aiController.Tick(Time.deltaTime))
+            Observable.EveryFixedUpdate()
+                .Subscribe(_ => _aiController.Tick(Time.fixedDeltaTime))
                 .AddTo(_disposables);
 
             this.OnCollisionEnter2DAsObservable()
