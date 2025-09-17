@@ -13,13 +13,15 @@ MonoBehaviour:
   m_Name: BattlefieldConfig
   m_EditorClassIdentifier: 
   fieldSize: {x: 15, y: 31}
-  enemyAmount: 4
-  moveCruiseSpeed: 2.5
-  respawnDelay: 1
   spawnWallOffset: 2
+  enemies:
+  - count: 3
+    tankConfig: {fileID: 11400000, guid: b31082bde4da21547aed7eb9e421f000, type: 2}
+  - count: 2
+    tankConfig: {fileID: 11400000, guid: 072fc23b706754e47afca129364d7d04, type: 2}
+  - count: 1
+    tankConfig: {fileID: 11400000, guid: 29a8eb56a18f08149b416490895bb7df, type: 2}
   playerTankPrefab: {fileID: 5947381835198154081, guid: 8560c414b3c52354cb5c8101cefb2f9b, type: 3}
-  playerConfig: {fileID: 11400000, guid: b25348273cd6dd74fa7992309f88913e, type: 2}
   enemyTankPrefab: {fileID: 1697032594009802573, guid: c4dfb8c32d6ae2548bb7228063a00eea, type: 3}
-  enemyConfigs:
-  - {fileID: 11400000, guid: 394dc1df3aa117045ab64d8a1212c540, type: 2}
+  playerConfig: {fileID: 11400000, guid: b25348273cd6dd74fa7992309f88913e, type: 2}
   powerUpSpawnConfig: {fileID: 11400000, guid: 2f98dca5846f0b54ca9031066a04bdd9, type: 2}

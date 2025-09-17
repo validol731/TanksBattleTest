@@ -28,7 +28,8 @@ namespace Features.Tanks
         public IMovementController Movement => _movementController;
         public TankState State => _state;
         public int MaxHp => _config.maxHp;
-        private bool IsEnemy => _config.isEnemy;
+        public float RespawnDelay => _config.respawnDelay;
+        private bool IsEnemy => _config.IsEnemy;
         private int _weaponLevelIndex = 0;
 
         [Inject]
@@ -70,7 +71,7 @@ namespace Features.Tanks
 
         private void BuildWeaponFromSlot()
         {
-            _weapon = _weaponFactory.Build(_config.weaponConfig, _weaponLevelIndex, _config.isEnemy);
+            _weapon = _weaponFactory.Build(_config.weaponConfig, _weaponLevelIndex, _config.IsEnemy);
         }
 
         public void ResetForRespawn()
@@ -143,6 +144,7 @@ namespace Features.Tanks
             if (_state.Hp.Value <= 0)
             {
                 _state.IsAlive.Value = false;
+                _weaponLevelIndex = 0;
                 _diedSubject.OnNext(this);
                 gameObject.SetActive(false);
             }

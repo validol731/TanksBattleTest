@@ -3,6 +3,7 @@ using VContainer;
 using UniRx;
 using UniRx.Triggers;
 using Configs;
+using Features.AI.Config;
 using Features.Tanks;
 
 namespace Features.AI
@@ -16,6 +17,7 @@ namespace Features.AI
         private Tank _tank;
         private Rigidbody2D _rigidbody2D;
         private readonly CompositeDisposable _disposables = new();
+        private AITankConfig  _config;
 
         [Inject]
         public void Construct(IAIController aiController, BattlefieldConfig battlefieldConfig)
@@ -23,7 +25,10 @@ namespace Features.AI
             _aiController = aiController;
             _battlefieldConfig = battlefieldConfig;
         }
-
+        public void SetProfile(AITankConfig config)
+        {
+            _config = config;
+        }
         private void Awake()
         {
             _tank = GetComponent<Tank>();
@@ -33,7 +38,10 @@ namespace Features.AI
         private void Start()
         {
             _aiController.Setup(_tank.Movement, _battlefieldConfig, _rigidbody2D);
-
+            if (_config != null)
+            {
+                _aiController.ApplyProfile(_config);
+            }
             Observable.EveryFixedUpdate()
                 .Subscribe(_ => _aiController.Tick(Time.fixedDeltaTime))
                 .AddTo(_disposables);

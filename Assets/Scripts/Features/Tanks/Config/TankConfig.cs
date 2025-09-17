@@ -1,22 +1,17 @@
-using System;
 using Features.Combat.Config;
+using Features.Movement.Config;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Features.Tanks.Config
 {
-    [CreateAssetMenu(menuName = "Configs/TankConfig")]
+    [CreateAssetMenu(menuName = "Configs/Tanks/TankConfig")]
     public class TankConfig : ScriptableObject
     {
-        [SerializeField] public bool isEnemy;
+        public virtual bool IsEnemy { get; set; } = false;
         [SerializeField] public Sprite image;
-        [SerializeField] public float maxForwardSpeed = 4f;
-        [SerializeField] public float maxBackwardSpeed = 3f;
-        [SerializeField] public float acceleration = 10f;
-        [SerializeField] public float turnRadius = 2.0f;
-        [SerializeField] public float omegaInPlace = 2.5f;
-        [SerializeField] public float omegaMaxClamp = 2.5f;
         [SerializeField] public int maxHp = 1;
+        [SerializeField] public float respawnDelay = 1.0f;
         [SerializeField] public WeaponConfig weaponConfig;
+        [SerializeField] public MovementBaseConfig movementBaseConfig;
     }
 }

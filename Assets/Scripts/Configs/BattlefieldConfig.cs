@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Features.AI.Config;
 using Features.PowerUps.Config;
 using Features.Tanks;
 using Features.Tanks.Config;
@@ -11,20 +13,19 @@ namespace Configs
     {
         [Header("Map Setup")]
         [SerializeField] private Vector2 fieldSize= new(16,16);
+        [SerializeField] public float spawnWallOffset = 2f;
 
         [Header("General")]
-        [SerializeField] public int enemyAmount = 4;
-        [SerializeField] public float moveCruiseSpeed = 2.5f;
-        [SerializeField] public float respawnDelay = 1.0f;
-        [SerializeField] public float spawnWallOffset = 2f;
         
-        [Header("Prefabs and configs")]
+        [Header("Enemies by difficulty")]
+        public List<EnemyPack> enemies = new();
+        
+        [Header("Player configs")]
         [SerializeField] public Tank playerTankPrefab;
+        [SerializeField] public Tank enemyTankPrefab;
         [SerializeField] public TankConfig playerConfig;
         
-        [SerializeField] public Tank enemyTankPrefab;
-        [SerializeField] public List<TankConfig> enemyConfigs = new();
-        
+        [Header("Power Ups")]
         [SerializeField] public PowerUpSpawnConfig powerUpSpawnConfig;
         
         public Vector2 MapCenter => Vector2.zero;
@@ -33,5 +34,12 @@ namespace Configs
         public Vector2 MapMax => new(MapWidth * 0.5f, MapHeight * 0.5f);
         public float MapWidth => fieldSize.x;
         public float MapHeight => fieldSize.y;
+        
+        [Serializable]
+        public class EnemyPack
+        {
+            public int count = 1; 
+            public AITankConfig tankConfig; 
+        }
     }
 }

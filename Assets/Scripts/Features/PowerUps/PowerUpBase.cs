@@ -9,7 +9,7 @@ namespace Features.PowerUps
     public abstract class PowerUpBase : MonoBehaviour, IPowerUpEffect
     {
         [SerializeField] private int aiPriority = 0;
-        
+
         [Header("VFX (optional)")]
         [SerializeField] private GameObject pickupVfxPrefab;
         [SerializeField] private float vfxLifetime = 1.0f;
@@ -19,6 +19,7 @@ namespace Features.PowerUps
 
         private bool _allowPlayerPickup = true;
         private bool _allowEnemyPickup  = false;
+
         protected virtual void Reset()
         {
             Collider2D c = GetComponent<Collider2D>();
@@ -33,9 +34,15 @@ namespace Features.PowerUps
             _allowPlayerPickup = allowPlayer;
             _allowEnemyPickup = allowEnemy;
         }
+
         public int GetAiPriority(Tank tank)
         {
             return aiPriority;
+        }
+
+        public virtual float GetPickupDesire(Tank tank)
+        {
+            return 1f;
         }
 
         protected virtual void OnTriggerEnter2D(Collider2D other)
@@ -58,12 +65,11 @@ namespace Features.PowerUps
 
             if (CanConsume(tank))
             {
-                
                 Apply(tank);
                 DestroyPowerUp();
             }
         }
-        
+
         public bool CanBePickedBy(Tank tank)
         {
             if (tank == null)

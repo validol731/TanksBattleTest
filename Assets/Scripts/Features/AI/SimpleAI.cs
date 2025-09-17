@@ -1,9 +1,9 @@
 using UnityEngine;
 using Features.Movement;
 using Configs;
+using Features.AI.Config;
 using Features.Tanks;
 using Features.PowerUps;
-using Features.PowerUps.PowerUpsEntities;
 
 namespace Features.AI
 {
@@ -17,14 +17,24 @@ namespace Features.AI
         private Transform _playerTransform;
 
         private float _brakeTimerSeconds;
-
         private float _repathTimerSeconds;
         private Vector2 _seekTarget;
         private float _targetHeadingRadians;
-        private float _cruiseSpeed;
 
         private LayerMask _wallsMask;
         private LayerMask _powerUpMask;
+
+        private float _fireAngleToleranceDeg = 8f;
+        private float _engageRadius = 8f;
+        private float _stopAndAimDistance = 5f;
+        private float _pursuitAbortDistance = 12f;
+
+        private float _cruiseSpeedBase = 2.5f;
+        private float _cruiseSpeed = 2.5f;
+        private float _brakeBeforeFireSeconds = 0.15f;
+
+        private float _lootChaseRadius = 10.0f;
+        private int _lootPriorityBias = 0;
 
         private readonly float _seekRepathInterval = 1f;
         private readonly float _seekJitterRadius = 16f;
@@ -32,22 +42,17 @@ namespace Features.AI
         private readonly float _seekTargetMinDistance = 2.0f;
         private readonly float _arriveRadius = 1.0f;
 
-        private readonly float _engageRadius = 8.0f;
         private readonly float _engageRepathInterval = 1f;
-        private readonly float _stopAndAimDistance = 5.0f;
-        private readonly float _fireAngleToleranceDeg = 6.0f;
         private readonly bool _useLineOfSight = true;
 
-        private readonly float _brakeBeforeFireSeconds = 0.15f;
         private readonly float _boundsInset = 0.64f;
+
         
         private PowerUpBase _lootTarget;
         private float _lootScanTimer;
         private float _lootRepathTimer;
         private readonly float _lootScanInterval = 0.5f;
         private readonly float _lootRepathInterval = 0.3f;
-        private readonly float _lootChaseRadius = 10.0f;
-        private readonly float _lootAbortDistance = 12.0f;
 
         public bool HasPlayer => _playerTransform != null;
 
@@ -74,7 +79,6 @@ namespace Features.AI
             _rigidbody2D = rigidbody2D;
             _tank = rigidbody2D.GetComponent<Tank>();
 
-            _cruiseSpeed = _config.moveCruiseSpeed;
             _targetHeadingRadians = _movementController.CurrentHeadingRad;
 
             GameObject player = GameObject.FindWithTag("Player");
@@ -109,7 +113,40 @@ namespace Features.AI
 
             _lootScanTimer = 0f;
             _lootRepathTimer = 0f;
-            _lootTarget = null;
+
+            _cruiseSpeed = _cruiseSpeedBase;
+        }
+
+        public void ApplyProfile(AITankConfig config)
+        {
+            if (config == null)
+            {
+                return;
+            }
+
+            float v = Mathf.Clamp01(config.randomizePercent);
+            float Var()
+            {
+                float delta = Random.Range(-v, v);
+                return 1f + delta;
+            }
+
+            _fireAngleToleranceDeg = Mathf.Max(0.5f, config.fireAngleToleranceDeg * Var());
+            _engageRadius = Mathf.Max(0.5f, config. engageRadius * Var());
+            _stopAndAimDistance = Mathf.Max(0.25f, config. stopAndAimDistance * Var());
+            _pursuitAbortDistance = Mathf.Max(_engageRadius + 1f, config. pursuitAbortDistance * Var());
+
+            _cruiseSpeed = Mathf.Max(0.2f, _cruiseSpeedBase * config. moveSpeedMultiplier * Var());
+            _brakeBeforeFireSeconds = Mathf.Max(0.01f, config. brakeBeforeFireSeconds * Var());
+
+            _lootChaseRadius = Mathf.Max(0.5f, config. lootChaseRadius * Var());
+
+            int jitter = 0;
+            if (config. lootPriorityJitter > 0)
+            {
+                jitter = Random.Range(-config. lootPriorityJitter, config. lootPriorityJitter + 1);
+            }
+            _lootPriorityBias = config. lootPriorityBias + jitter;
         }
 
         public void Tick(float deltaTime)
@@ -210,7 +247,7 @@ namespace Features.AI
             }
 
             float d = Vector2.Distance(_rigidbody2D.position, _lootTarget.transform.position);
-            if (d > _lootAbortDistance)
+            if (d > _pursuitAbortDistance)
             {
                 return false;
             }
@@ -260,26 +297,27 @@ namespace Features.AI
                     continue;
                 }
 
-                PowerUpBase p = c.GetComponentInParent<PowerUpBase>();
-                if (p == null)
+                PowerUpBase powerUpBase = c.GetComponentInParent<PowerUpBase>();
+                if (powerUpBase == null)
                 {
                     continue;
                 }
-                if (p.gameObject.activeInHierarchy == false)
+                if (powerUpBase.gameObject.activeInHierarchy == false)
                 {
                     continue;
                 }
-                if (p.CanBePickedBy(_tank) == false)
+                if (powerUpBase.CanBePickedBy(_tank) == false)
                 {
                     continue;
                 }
-                if (p.CanConsume(_tank) == false)
+                if (powerUpBase.CanConsume(_tank) == false)
                 {
                     continue;
                 }
 
-                int pri = p.GetAiPriority(_tank);
-                float d = Vector2.Distance(_rigidbody2D.position, p.transform.position);
+                int pri = powerUpBase.GetAiPriority(_tank);
+                pri += _lootPriorityBias;
+                float d = Vector2.Distance(_rigidbody2D.position, powerUpBase.transform.position);
 
                 bool betterByPriority = pri > bestPriority;
                 bool samePriorityButCloser = pri == bestPriority && d < bestDist;
@@ -288,7 +326,7 @@ namespace Features.AI
                 {
                     bestPriority = pri;
                     bestDist = d;
-                    best = p;
+                    best = powerUpBase;
                 }
             }
 
@@ -448,6 +486,7 @@ namespace Features.AI
                     return;
                 }
             }
+
             _movementController.MoveTowardsHeading(_targetHeadingRadians, _cruiseSpeed, deltaTime);
         }
 

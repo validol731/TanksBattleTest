@@ -1,5 +1,4 @@
-﻿// Features/PowerUps/PowerUpSpawner.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -95,7 +94,8 @@ namespace Features.PowerUps
                             continue;
                         }
 
-                        if (!ExistsEligibleTaker(entry))
+                        // === НОВЕ: перевіряємо “чи є кому ймовірно підняти” з урахуванням desire ===
+                        if (!ExistsEligibleTakerWithChance(entry, 0.05f))
                         {
                             continue;
                         }
@@ -214,13 +214,20 @@ namespace Features.PowerUps
             return true;
         }
 
-        private bool ExistsEligibleTaker(PowerUpEntry entry)
+        private bool ExistsEligibleTakerWithChance(PowerUpEntry entry, float minDesireClamp = 0.05f)
         {
+            if (entry == null || entry.prefab == null)
+            {
+                return false;
+            }
+
             Tank[] tanks = FindObjectsOfType<Tank>(includeInactive: false);
             if (tanks == null || tanks.Length == 0)
             {
                 return false;
             }
+
+            PowerUpBase proto = entry.prefab;
 
             for (int i = 0; i < tanks.Length; i++)
             {
@@ -244,8 +251,27 @@ namespace Features.PowerUps
                     continue;
                 }
 
-                PowerUpBase proto = entry.prefab;
-                if (proto != null && proto.CanConsume(t))
+                if (proto.CanConsume(t) == false)
+                {
+                    continue;
+                }
+                if (proto.CanBePickedBy(t) == false)
+                {
+                    continue;
+                }
+
+                float desire = proto.GetPickupDesire(t);
+                if (desire < minDesireClamp)
+                {
+                    desire = minDesireClamp;
+                }
+                if (desire > 1f)
+                {
+                    desire = 1f;
+                }
+
+                float roll = Random.value;
+                if (roll < desire)
                 {
                     return true;
                 }

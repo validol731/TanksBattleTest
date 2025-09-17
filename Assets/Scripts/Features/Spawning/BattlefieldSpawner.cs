@@ -2,8 +2,8 @@
 using UnityEngine;
 using VContainer;
 using UniRx;
-using Configs;
 using Cysharp.Threading.Tasks;
+using Configs;
 using Features.Tanks;
 using Features.Tanks.Config;
 using Features.AI;
@@ -14,9 +14,8 @@ namespace Features.Spawning
 {
     public class BattlefieldSpawner : MonoBehaviour
     {
-        [Header("Spawn Safety")]
-        [SerializeField] private float minSpawnDistanceFromPlayer = 10f;
-        [SerializeField] private float minSpawnDistanceFromEnemies = 10f;
+        private readonly float _minSpawnDistanceFromPlayer = 10f;
+        private readonly float _minSpawnDistanceFromEnemies = 10f;
 
         private IObjectResolver _resolver;
         private BattlefieldConfig _config;
@@ -25,7 +24,7 @@ namespace Features.Spawning
         private bool _spawned;
 
         private Tank _player;
-        private readonly List<Tank> _enemies = new(16);
+        private readonly List<Tank> _enemies = new List<Tank>(32);
 
         [Inject]
         public void Construct(IObjectResolver resolver, BattlefieldConfig config)
@@ -45,7 +44,7 @@ namespace Features.Spawning
             _nextCornerIndex = 0;
 
             SpawnPlayer();
-            SpawnEnemies();
+            SpawnEnemiesFromPacks();
         }
 
         private void SpawnPlayer()
@@ -53,7 +52,12 @@ namespace Features.Spawning
             TankConfig playerConfig = _config.playerConfig;
             if (playerConfig == null)
             {
-                Debug.LogError("[BattlefieldSpawner] PlayerConfig is null in BattlefieldConfig.");
+                Debug.LogError("[BattlefieldSpawner] PlayerConfig is null.");
+                return;
+            }
+            if (_config.playerTankPrefab == null)
+            {
+                Debug.LogError("[BattlefieldSpawner] playerTankPrefab is null.");
                 return;
             }
 
@@ -66,7 +70,7 @@ namespace Features.Spawning
             _resolver.InjectGameObject(player.gameObject);
             player.Initialize(playerConfig);
 
-            var host = player.gameObject.AddComponent<PlayerControllerHost>();
+            PlayerControllerHost host = player.gameObject.AddComponent<PlayerControllerHost>();
             _resolver.Inject(host);
 
             player.Died.Subscribe(OnPlayerDie).AddTo(player);
@@ -76,22 +80,17 @@ namespace Features.Spawning
         private void OnPlayerDie(Tank player)
         {
             Vector2 bestCorner = CornerByIndex(_nextCornerIndex);
-            float bestCornerMinEnemyDist = -1f;
+            float bestScore = -1f;
 
             for (int i = 0; i < 4; i++)
             {
                 Vector2 corner = CornerByIndex(i);
-                float minDistToEnemy = MinDistanceToActiveEnemies(corner);
+                float distEnemies = MinDistanceToActiveEnemies(corner);
+                float score = distEnemies;
 
-                if (minDistToEnemy >= minSpawnDistanceFromEnemies)
+                if (score > bestScore)
                 {
-                    bestCorner = corner;
-                    break;
-                }
-
-                if (minDistToEnemy > bestCornerMinEnemyDist)
-                {
-                    bestCornerMinEnemyDist = minDistToEnemy;
+                    bestScore = score;
                     bestCorner = corner;
                 }
             }
@@ -105,50 +104,70 @@ namespace Features.Spawning
             RespawnAfterDelay(player, bestCorner).Forget();
         }
 
-        private void SpawnEnemies()
+        private void SpawnEnemiesFromPacks()
         {
-            IReadOnlyList<TankConfig> configs = _config.enemyConfigs;
-            if (configs == null || configs.Count == 0)
+            if (_config.enemies == null || _config.enemies.Count == 0)
             {
-                Debug.LogError("[BattlefieldSpawner] EnemyConfigs list is empty in BattlefieldConfig.");
+                Debug.LogError("[BattlefieldSpawner] enemies list is empty in BattlefieldConfig.");
                 return;
             }
 
-            for (int i = 0; i < _config.enemyAmount; i++)
+            for (int p = 0; p < _config.enemies.Count; p++)
             {
-                int configIndex = Random.Range(0, configs.Count);
-                TankConfig enemyConfig = configs[configIndex];
+                BattlefieldConfig.EnemyPack pack = _config.enemies[p];
+                if (pack == null)
+                {
+                    continue;
+                }
+                if (pack.count <= 0)
+                {
+                    continue;
+                }
+                if (pack.tankConfig == null)
+                {
+                    Debug.LogWarning("[BattlefieldSpawner] EnemyPack has no TankConfig.");
+                    continue;
+                }
 
-                Vector2 position = FindBorderPointFarFromPlayer(minSpawnDistanceFromPlayer, 24);
-                Quaternion rotation = Quaternion.identity;
+                for (int i = 0; i < pack.count; i++)
+                {
+                    Vector2 position = FindBorderPointSafe(_minSpawnDistanceFromPlayer, _minSpawnDistanceFromEnemies, 32);
+                    Quaternion rotation = Quaternion.identity;
 
-                Tank enemy = Instantiate(_config.enemyTankPrefab, position, rotation);
-                _resolver.InjectGameObject(enemy.gameObject);
-                enemy.Initialize(enemyConfig);
+                    Tank prefab = _config.enemyTankPrefab;
+                    if (prefab == null)
+                    {
+                        Debug.LogError("[BattlefieldSpawner] Enemy prefab is null.");
+                        return;
+                    }
 
-                Vector2 center = _config.MapCenter;
-                Vector2 toCenter = (center - position).normalized;
-                float headingDegrees = Mathf.Atan2(toCenter.y, toCenter.x) * Mathf.Rad2Deg;
-                enemy.transform.rotation = Quaternion.Euler(0f, 0f, headingDegrees);
+                    Tank enemy = Instantiate(prefab, position, rotation);
+                    _resolver.InjectGameObject(enemy.gameObject);
+                    enemy.Initialize(pack.tankConfig);
 
-                EnemyAIHost host = enemy.gameObject.AddComponent<EnemyAIHost>();
-                _resolver.Inject(host);
+                    Vector2 toCenter = (_config.MapCenter - position).normalized;
+                    float headingDegrees = Mathf.Atan2(toCenter.y, toCenter.x) * Mathf.Rad2Deg;
+                    enemy.transform.rotation = Quaternion.Euler(0f, 0f, headingDegrees);
 
-                enemy.Died.Subscribe(OnEnemyDie).AddTo(enemy);
+                    EnemyAIHost host = enemy.gameObject.AddComponent<EnemyAIHost>();
+                    _resolver.Inject(host);
+                    host.SetProfile(pack.tankConfig);
 
-                _enemies.Add(enemy);
+                    enemy.Died.Subscribe(OnEnemyDie).AddTo(enemy);
+                    _enemies.Add(enemy);
+                }
             }
         }
 
         private void OnEnemyDie(Tank enemy)
         {
-            Vector2 newPosition = FindBorderPointFarFromPlayer(minSpawnDistanceFromPlayer, 24);
+            Vector2 newPosition = FindBorderPointSafe(_minSpawnDistanceFromPlayer, _minSpawnDistanceFromEnemies, 32);
             RespawnAfterDelay(enemy, newPosition).Forget();
         }
 
         public async UniTask RespawnAfterDelay(Tank tank, Vector2 position)
         {
-            float delaySeconds = _config.respawnDelay;
+            float delaySeconds = tank.RespawnDelay;
 
             tank.gameObject.SetActive(false);
             await UniTask.Delay((int)(delaySeconds * 1000f));
@@ -156,24 +175,32 @@ namespace Features.Spawning
             tank.transform.position = position;
             tank.ResetForRespawn();
         }
-        private Vector2 FindBorderPointFarFromPlayer(float minDist, int attempts)
+
+        private Vector2 FindBorderPointSafe(float minDistFromPlayer, float minDistFromEnemies, int attempts)
         {
             Vector2 best = RandomBorderPoint();
-            float bestDist = -1f;
+            float bestScore = -1f;
 
             for (int i = 0; i < attempts; i++)
             {
                 Vector2 p = RandomBorderPoint();
 
-                if (IsFarFromPlayer(p, minDist))
+                bool farFromPlayer = IsFarFromPlayer(p, minDistFromPlayer);
+                bool farFromEnemies = IsFarFromEnemies(p, minDistFromEnemies);
+
+                if (farFromPlayer && farFromEnemies)
                 {
                     return p;
                 }
 
-                float d = DistanceToPlayer(p);
-                if (d > bestDist)
+                float score = 0f;
+                float dPlayer = DistanceToPlayer(p);
+                float dEnemies = MinDistanceToActiveEnemies(p);
+                score = dPlayer + dEnemies;
+
+                if (score > bestScore)
                 {
-                    bestDist = d;
+                    bestScore = score;
                     best = p;
                 }
             }
@@ -194,6 +221,16 @@ namespace Features.Spawning
 
             float d = Vector2.Distance(point, _player.transform.position);
             if (d >= minDist)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private bool IsFarFromEnemies(Vector2 point, float minDist)
+        {
+            float min = MinDistanceToActiveEnemies(point);
+            if (min >= minDist)
             {
                 return true;
             }
@@ -238,7 +275,7 @@ namespace Features.Spawning
             }
             return min;
         }
-        
+
         private Vector2 RandomBorderPoint()
         {
             float halfMinSide = 0.5f * Mathf.Min(_config.MapWidth, _config.MapHeight);
@@ -250,19 +287,19 @@ namespace Features.Spawning
             int edgeIndex = Random.Range(0, 4);
             Vector2 point = Vector2.zero;
 
-            if (edgeIndex == 0) // left
+            if (edgeIndex == 0)
             {
                 point = new Vector2(min.x, Random.Range(min.y, max.y));
             }
-            else if (edgeIndex == 1) // right
+            else if (edgeIndex == 1)
             {
                 point = new Vector2(max.x, Random.Range(min.y, max.y));
             }
-            else if (edgeIndex == 2) // bottom
+            else if (edgeIndex == 2)
             {
                 point = new Vector2(Random.Range(min.x, max.x), min.y);
             }
-            else // top
+            else
             {
                 point = new Vector2(Random.Range(min.x, max.x), max.y);
             }
@@ -280,19 +317,19 @@ namespace Features.Spawning
 
             if (index == 0)
             {
-                return new Vector2(min.x, min.y); // bottom-left
+                return new Vector2(min.x, min.y);
             }
             else if (index == 1)
             {
-                return new Vector2(max.x, min.y); // bottom-right
+                return new Vector2(max.x, min.y);
             }
             else if (index == 2)
             {
-                return new Vector2(min.x, max.y); // top-left
+                return new Vector2(min.x, max.y);
             }
             else
             {
-                return new Vector2(max.x, max.y); // top-right
+                return new Vector2(max.x, max.y);
             }
         }
     }

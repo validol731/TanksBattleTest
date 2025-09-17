@@ -29,15 +29,15 @@ namespace Features.Movement
             float targetSpeed;
             if (forwardInput >= 0f)
             {
-                targetSpeed = _config.maxForwardSpeed * forwardInput;
+                targetSpeed = _config.movementBaseConfig.maxForwardSpeed * forwardInput;
             }
             else
             {
-                targetSpeed = _config.maxBackwardSpeed * forwardInput;
+                targetSpeed = _config.movementBaseConfig.maxBackwardSpeed * forwardInput;
             }
 
             float currentForwardSpeed = Vector2.Dot(_rigidbody.velocity, Direction(_headingRad));
-            float desiredSpeed = Mathf.MoveTowards(currentForwardSpeed, targetSpeed, _config.acceleration * deltaTime);
+            float desiredSpeed = Mathf.MoveTowards(currentForwardSpeed, targetSpeed, _config.movementBaseConfig.acceleration * deltaTime);
 
             bool isInPlaceTurn = Mathf.Abs(forwardInput) < 0.0001f;
             if (isInPlaceTurn)
@@ -45,19 +45,19 @@ namespace Features.Movement
                 desiredSpeed = 0f;
             }
 
-            float omegaDesired = turnInput * _config.omegaMaxClamp;
+            float omegaDesired = turnInput * _config.movementBaseConfig.omegaMaxClamp;
 
             float omegaMax;
             if (isInPlaceTurn)
             {
-                omegaMax = _config.omegaInPlace;
+                omegaMax = _config.movementBaseConfig.omegaInPlace;
             }
             else
             {
-                float omegaMaxByRadius = Mathf.Abs(desiredSpeed) / Mathf.Max(0.01f, _config.turnRadius);
-                if (omegaMaxByRadius > _config.omegaMaxClamp)
+                float omegaMaxByRadius = Mathf.Abs(desiredSpeed) / Mathf.Max(0.01f, _config.movementBaseConfig.turnRadius);
+                if (omegaMaxByRadius > _config.movementBaseConfig.omegaMaxClamp)
                 {
-                    omegaMax = _config.omegaMaxClamp;
+                    omegaMax = _config.movementBaseConfig.omegaMaxClamp;
                 }
                 else
                 {
@@ -137,9 +137,9 @@ namespace Features.Movement
             }
 
             float forwardInput = 1f;
-            if (_config.maxForwardSpeed > 0.0001f)
+            if (_config.movementBaseConfig.maxForwardSpeed > 0.0001f)
             {
-                float desiredInput = cruiseSpeed / _config.maxForwardSpeed;
+                float desiredInput = cruiseSpeed / _config.movementBaseConfig.maxForwardSpeed;
                 if (desiredInput < 0f)
                 {
                     desiredInput = 0f;

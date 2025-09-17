@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 569e1be0827d4b8688e75844729a9c85, type: 3}
+  m_Name: AITankConfig_Hard
+  m_EditorClassIdentifier: 
+  image: {fileID: 21300000, guid: 0efe863667188a5458ab5ac26b990d68, type: 3}
+  maxHp: 4
+  respawnDelay: 5
+  weaponConfig: {fileID: 11400000, guid: 26c0daa800a84e94cb5777160d579837, type: 2}
+  movementBaseConfig: {fileID: 11400000, guid: 0a69d8143742cbf489250e71ddc72071, type: 2}
+  fireAngleToleranceDeg: 4
+  engageRadius: 10
+  moveSpeedMultiplier: 1.15
+  brakeBeforeFireSeconds: 0.05
+  stopAndAimDistance: 6
+  pursuitAbortDistance: 14
+  lootChaseRadius: 12
+  lootPriorityBias: 4
+  randomizePercent: 0.15
+  lootPriorityJitter: 2
