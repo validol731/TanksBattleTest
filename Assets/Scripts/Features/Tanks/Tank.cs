@@ -2,6 +2,7 @@ using System;
 using Features.Combat;
 using Features.Movement;
 using Features.Tanks.Config;
+using Features.UI;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ namespace Features.Tanks
     public class Tank : MonoBehaviour, IDamageable
     {
         [SerializeField] private SpriteRenderer image;
+        [SerializeField] private HeartsView2D heartsView2D;
         
         private TankConfig _config;
         private Rigidbody2D _rigidbody2D;
@@ -24,7 +26,9 @@ namespace Features.Tanks
         private readonly Subject<Tank> _diedSubject = new();
         public IObservable<Tank> Died => _diedSubject;
         public IMovementController Movement => _movementController;
-        public bool IsEnemy => _config.isEnemy;
+        public TankState State => _state;
+        public int MaxHp => _config.maxHp;
+        private bool IsEnemy => _config.isEnemy;
 
         [Inject]
         public void Construct(IMovementController movementController, IWeaponFactory weaponFactory)
@@ -47,6 +51,7 @@ namespace Features.Tanks
             _config = stats;
             image.sprite = _config.image;
             ConfigureFromStats();
+            heartsView2D.Initialize(this);
         }
 
         private void ConfigureFromStats()
