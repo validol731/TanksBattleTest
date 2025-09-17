@@ -8,16 +8,17 @@ namespace Features.PowerUps
     [RequireComponent(typeof(Collider2D))]
     public abstract class PowerUpBase : MonoBehaviour, IPowerUpEffect
     {
-        [Header("Pickup")]
-        [SerializeField] private bool playerOnly = true;
-
+        [SerializeField] private int aiPriority = 0;
+        
         [Header("VFX (optional)")]
         [SerializeField] private GameObject pickupVfxPrefab;
         [SerializeField] private float vfxLifetime = 1.0f;
 
-        private readonly Subject<PowerUpBase> _collected = new();
+        private readonly Subject<PowerUpBase> _collected = new Subject<PowerUpBase>();
         public IObservable<PowerUpBase> Collected => _collected;
 
+        private bool _allowPlayerPickup = true;
+        private bool _allowEnemyPickup  = false;
         protected virtual void Reset()
         {
             Collider2D c = GetComponent<Collider2D>();
@@ -25,6 +26,16 @@ namespace Features.PowerUps
             {
                 c.isTrigger = true;
             }
+        }
+
+        public void ConfigurePickupPermissions(bool allowPlayer, bool allowEnemy)
+        {
+            _allowPlayerPickup = allowPlayer;
+            _allowEnemyPickup = allowEnemy;
+        }
+        public int GetAiPriority(Tank tank)
+        {
+            return aiPriority;
         }
 
         protected virtual void OnTriggerEnter2D(Collider2D other)
@@ -35,22 +46,54 @@ namespace Features.PowerUps
                 return;
             }
 
-            if (playerOnly)
+            bool isPlayer = tank.gameObject.CompareTag("Player");
+            if (isPlayer && !_allowPlayerPickup)
             {
-                if (tank.gameObject.CompareTag("Player") == false)
-                {
-                    return;
-                }
+                return;
+            }
+            if (!isPlayer && !_allowEnemyPickup)
+            {
+                return;
             }
 
-            bool applied = Apply(tank);
-            if (applied)
+            if (CanConsume(tank))
             {
-                PlayPickupVfx();
-                _collected.OnNext(this);
-                gameObject.SetActive(false);
-                Destroy(gameObject);
+                
+                Apply(tank);
+                DestroyPowerUp();
             }
+        }
+        
+        public bool CanBePickedBy(Tank tank)
+        {
+            if (tank == null)
+            {
+                return false;
+            }
+
+            bool isPlayer = tank.gameObject.CompareTag("Player");
+            if (isPlayer)
+            {
+                if (_allowPlayerPickup)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            if (_allowEnemyPickup)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private void DestroyPowerUp()
+        {
+            PlayPickupVfx();
+            _collected.OnNext(this);
+            gameObject.SetActive(false);
+            Destroy(gameObject);
         }
 
         private void PlayPickupVfx()
@@ -59,7 +102,6 @@ namespace Features.PowerUps
             {
                 return;
             }
-
             GameObject go = Instantiate(pickupVfxPrefab, transform.position, Quaternion.identity);
             if (vfxLifetime > 0f)
             {
@@ -67,6 +109,7 @@ namespace Features.PowerUps
             }
         }
 
-        public abstract bool Apply(Tank target);
+        public abstract bool CanConsume(Tank target);
+        public abstract void Apply(Tank target);
     }
 }

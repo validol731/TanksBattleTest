@@ -20,7 +20,5 @@ MonoBehaviour:
   turnRadius: 0.01
   omegaInPlace: 5
   omegaMaxClamp: 5
-  maxHp: 5
-  weapon:
-    config: {fileID: 11400000, guid: a17656b05526ecd4fb67b76fd00c4c78, type: 2}
-    levelIndex: 0
+  maxHp: 10
+  weaponConfig: {fileID: 11400000, guid: a17656b05526ecd4fb67b76fd00c4c78, type: 2}

@@ -17,14 +17,6 @@ namespace Features.Tanks.Config
         [SerializeField] public float omegaInPlace = 2.5f;
         [SerializeField] public float omegaMaxClamp = 2.5f;
         [SerializeField] public int maxHp = 1;
-        [SerializeField] public WeaponSlot weapon = new();
-        
-        [Serializable]
-        public struct WeaponSlot
-        {
-            public WeaponConfig config;
-            [Min(0)] 
-            public int levelIndex;
-        }
+        [SerializeField] public WeaponConfig weaponConfig;
     }
 }

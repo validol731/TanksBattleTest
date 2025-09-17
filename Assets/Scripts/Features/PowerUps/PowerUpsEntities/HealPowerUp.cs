@@ -7,21 +7,19 @@ namespace Features.PowerUps.PowerUpsEntities
     public class HealPowerUp : PowerUpBase
     {
         [SerializeField] private int healAmount = 1;
-        public override bool Apply(Tank target)
+        public override bool CanConsume(Tank target)
         {
             if (target == null)
             {
                 return false;
             }
+            return target.State.Hp.Value < target.MaxHp;
+        }
 
+        public override void Apply(Tank target)
+        {
             int current = target.State.Hp.Value;
             int max = target.MaxHp;
-
-            if (current >= max)
-            {
-                return false;
-            }
-
             int newValue = current + healAmount;
             if (newValue > max)
             {
@@ -29,7 +27,6 @@ namespace Features.PowerUps.PowerUpsEntities
             }
 
             target.State.Hp.Value = newValue;
-            return true;
         }
     }
 }

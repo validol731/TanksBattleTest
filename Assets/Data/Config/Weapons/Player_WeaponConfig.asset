@@ -17,9 +17,41 @@ MonoBehaviour:
   levels:
   - bulletSpeed: 10
     bulletLife: 15
-    cooldown: 0.5
+    cooldown: 1
     projectilesPerShot: 1
     spreadDeg: 5
+    playerBulletPrefab: {fileID: 8147266638412925376, guid: f41eb63c06c77474685ad3c5b89acd34, type: 3}
+    enemyBulletPrefab: {fileID: 3126193277063431619, guid: e57203b16fb572c499edaaf953ce5016, type: 3}
+    damage: 1
+  - bulletSpeed: 10
+    bulletLife: 15
+    cooldown: 0.8
+    projectilesPerShot: 2
+    spreadDeg: 10
+    playerBulletPrefab: {fileID: 8147266638412925376, guid: f41eb63c06c77474685ad3c5b89acd34, type: 3}
+    enemyBulletPrefab: {fileID: 3126193277063431619, guid: e57203b16fb572c499edaaf953ce5016, type: 3}
+    damage: 1
+  - bulletSpeed: 10
+    bulletLife: 15
+    cooldown: 0.5
+    projectilesPerShot: 2
+    spreadDeg: 10
+    playerBulletPrefab: {fileID: 8147266638412925376, guid: f41eb63c06c77474685ad3c5b89acd34, type: 3}
+    enemyBulletPrefab: {fileID: 3126193277063431619, guid: e57203b16fb572c499edaaf953ce5016, type: 3}
+    damage: 1
+  - bulletSpeed: 10
+    bulletLife: 15
+    cooldown: 0.5
+    projectilesPerShot: 3
+    spreadDeg: 15
+    playerBulletPrefab: {fileID: 8147266638412925376, guid: f41eb63c06c77474685ad3c5b89acd34, type: 3}
+    enemyBulletPrefab: {fileID: 3126193277063431619, guid: e57203b16fb572c499edaaf953ce5016, type: 3}
+    damage: 1
+  - bulletSpeed: 10
+    bulletLife: 15
+    cooldown: 0.5
+    projectilesPerShot: 4
+    spreadDeg: 15
     playerBulletPrefab: {fileID: 8147266638412925376, guid: f41eb63c06c77474685ad3c5b89acd34, type: 3}
     enemyBulletPrefab: {fileID: 3126193277063431619, guid: e57203b16fb572c499edaaf953ce5016, type: 3}
     damage: 1

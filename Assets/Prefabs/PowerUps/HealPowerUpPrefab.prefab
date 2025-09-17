@@ -143,7 +143,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0830225647b44602960bd8c8d98740a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerOnly: 1
+  aiPriority: 10
   pickupVfxPrefab: {fileID: 0}
   vfxLifetime: 1
   healAmount: 1

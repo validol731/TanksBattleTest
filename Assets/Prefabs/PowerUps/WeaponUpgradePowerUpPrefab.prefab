@@ -122,7 +122,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: f135fe6a8e344fd42a1553afe2373df8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 1
+  m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
   m_Size: {x: 1, y: 1}
@@ -143,6 +143,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92874a9382594f9c9562959dd453ee83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerOnly: 1
+  aiPriority: 5
   pickupVfxPrefab: {fileID: 0}
   vfxLifetime: 1

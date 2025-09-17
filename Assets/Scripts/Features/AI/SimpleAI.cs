@@ -1,8 +1,9 @@
-// Features/AI/SeekAndEngageAI.cs
 using UnityEngine;
 using Features.Movement;
 using Configs;
 using Features.Tanks;
+using Features.PowerUps;
+using Features.PowerUps.PowerUpsEntities;
 
 namespace Features.AI
 {
@@ -15,7 +16,6 @@ namespace Features.AI
 
         private Transform _playerTransform;
 
-
         private float _brakeTimerSeconds;
 
         private float _repathTimerSeconds;
@@ -24,24 +24,32 @@ namespace Features.AI
         private float _cruiseSpeed;
 
         private LayerMask _wallsMask;
+        private LayerMask _powerUpMask;
 
-        public bool HasPlayer => _playerTransform != null;
-        
         private readonly float _seekRepathInterval = 1f;
-        private readonly float _seekJitterRadius = 16f;        
-        private readonly float _seekMinJitter = 6f;           
-        private readonly float _seekTargetMinDistance = 2.0f;   
-        private readonly float _arriveRadius = 1.0f;            
+        private readonly float _seekJitterRadius = 16f;
+        private readonly float _seekMinJitter = 6f;
+        private readonly float _seekTargetMinDistance = 2.0f;
+        private readonly float _arriveRadius = 1.0f;
 
-        
         private readonly float _engageRadius = 8.0f;
         private readonly float _engageRepathInterval = 1f;
         private readonly float _stopAndAimDistance = 5.0f;
         private readonly float _fireAngleToleranceDeg = 6.0f;
-        private readonly bool  _useLineOfSight = true;
+        private readonly bool _useLineOfSight = true;
 
         private readonly float _brakeBeforeFireSeconds = 0.15f;
         private readonly float _boundsInset = 0.64f;
+        
+        private PowerUpBase _lootTarget;
+        private float _lootScanTimer;
+        private float _lootRepathTimer;
+        private readonly float _lootScanInterval = 0.5f;
+        private readonly float _lootRepathInterval = 0.3f;
+        private readonly float _lootChaseRadius = 10.0f;
+        private readonly float _lootAbortDistance = 12.0f;
+
+        public bool HasPlayer => _playerTransform != null;
 
         public bool InEngage
         {
@@ -57,7 +65,6 @@ namespace Features.AI
         }
 
         public Vector2 SeekTarget => _seekTarget;
-
         public float TargetHeadingRadians => _targetHeadingRadians;
 
         public void Setup(IMovementController movementController, BattlefieldConfig config, Rigidbody2D rigidbody2D)
@@ -86,14 +93,46 @@ namespace Features.AI
                 _wallsMask = 0;
             }
 
+            int powerupsLayer = LayerMask.NameToLayer("PowerUps");
+            if (powerupsLayer >= 0)
+            {
+                _powerUpMask = 1 << powerupsLayer;
+            }
+            else
+            {
+                _powerUpMask = ~0;
+            }
+
             _repathTimerSeconds = 0f;
             _seekTarget = _rigidbody2D.position;
             _brakeTimerSeconds = 0f;
+
+            _lootScanTimer = 0f;
+            _lootRepathTimer = 0f;
+            _lootTarget = null;
         }
 
         public void Tick(float deltaTime)
         {
             EnsurePlayerRef();
+
+            _lootScanTimer -= deltaTime;
+            if (_lootScanTimer <= 0f)
+            {
+                UpdateLootTarget();
+                _lootScanTimer = _lootScanInterval;
+            }
+
+            if (_lootTarget != null)
+            {
+                bool stillValid = ValidateLootTarget();
+                if (stillValid)
+                {
+                    LootMove(deltaTime);
+                    return;
+                }
+                _lootTarget = null;
+            }
 
             float distanceToPlayer = float.PositiveInfinity;
             if (_playerTransform != null)
@@ -128,16 +167,6 @@ namespace Features.AI
             }
         }
 
-        private Vector2 ClampInsideBoundsWithInset(Vector2 p)
-        {
-            Vector2 min = _config.MapMin + new Vector2(_boundsInset, _boundsInset);
-            Vector2 max = _config.MapMax - new Vector2(_boundsInset, _boundsInset);
-
-            float x = Mathf.Clamp(p.x, min.x, max.x);
-            float y = Mathf.Clamp(p.y, min.y, max.y);
-
-            return new Vector2(x, y);
-        }
         public void OnCollision()
         {
             float add = Random.Range(Mathf.Deg2Rad * 120f, Mathf.Deg2Rad * 170f);
@@ -154,6 +183,127 @@ namespace Features.AI
                     _playerTransform = player.transform;
                 }
             }
+        }
+
+        private void UpdateLootTarget()
+        {
+            _lootTarget = FindBestPowerUp();
+        }
+
+        private bool ValidateLootTarget()
+        {
+            if (_lootTarget == null)
+            {
+                return false;
+            }
+            if (_lootTarget.gameObject.activeInHierarchy == false)
+            {
+                return false;
+            }
+            if (_lootTarget.CanBePickedBy(_tank) == false)
+            {
+                return false;
+            }
+            if (_lootTarget.CanConsume(_tank) == false)
+            {
+                return false;
+            }
+
+            float d = Vector2.Distance(_rigidbody2D.position, _lootTarget.transform.position);
+            if (d > _lootAbortDistance)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void LootMove(float deltaTime)
+        {
+            if (_lootTarget == null)
+            {
+                return;
+            }
+
+            _lootRepathTimer -= deltaTime;
+            if (_lootRepathTimer <= 0f)
+            {
+                _lootRepathTimer = _lootRepathInterval;
+
+                Vector2 pos = _rigidbody2D.position;
+                Vector2 toLoot = (Vector2)_lootTarget.transform.position - pos;
+
+                if (toLoot.sqrMagnitude > 0.0001f)
+                {
+                    _targetHeadingRadians = Mathf.Atan2(toLoot.y, toLoot.x);
+                }
+
+                _seekTarget = _lootTarget.transform.position;
+            }
+
+            _movementController.MoveTowardsHeading(_targetHeadingRadians, _cruiseSpeed, deltaTime);
+        }
+
+        private PowerUpBase FindBestPowerUp()
+        {
+            Collider2D[] hits = Physics2D.OverlapCircleAll(_rigidbody2D.position, _lootChaseRadius, _powerUpMask);
+
+            PowerUpBase best = null;
+            int bestPriority = int.MinValue;
+            float bestDist = float.PositiveInfinity;
+
+            for (int i = 0; i < hits.Length; i++)
+            {
+                Collider2D c = hits[i];
+                if (c == null)
+                {
+                    continue;
+                }
+
+                PowerUpBase p = c.GetComponentInParent<PowerUpBase>();
+                if (p == null)
+                {
+                    continue;
+                }
+                if (p.gameObject.activeInHierarchy == false)
+                {
+                    continue;
+                }
+                if (p.CanBePickedBy(_tank) == false)
+                {
+                    continue;
+                }
+                if (p.CanConsume(_tank) == false)
+                {
+                    continue;
+                }
+
+                int pri = p.GetAiPriority(_tank);
+                float d = Vector2.Distance(_rigidbody2D.position, p.transform.position);
+
+                bool betterByPriority = pri > bestPriority;
+                bool samePriorityButCloser = pri == bestPriority && d < bestDist;
+
+                if (betterByPriority || samePriorityButCloser)
+                {
+                    bestPriority = pri;
+                    bestDist = d;
+                    best = p;
+                }
+            }
+
+            return best;
+        }
+        
+        private Vector2 ClampInsideBoundsWithInset(Vector2 p)
+        {
+            Vector2 min = _config.MapMin + new Vector2(_boundsInset, _boundsInset);
+            Vector2 max = _config.MapMax - new Vector2(_boundsInset, _boundsInset);
+
+            float x = Mathf.Clamp(p.x, min.x, max.x);
+            float y = Mathf.Clamp(p.y, min.y, max.y);
+
+            return new Vector2(x, y);
         }
 
         private void UpdateSeekTarget()

@@ -29,6 +29,7 @@ namespace Features.Tanks
         public TankState State => _state;
         public int MaxHp => _config.maxHp;
         private bool IsEnemy => _config.isEnemy;
+        private int _weaponLevelIndex = 0;
 
         [Inject]
         public void Construct(IMovementController movementController, IWeaponFactory weaponFactory)
@@ -69,11 +70,7 @@ namespace Features.Tanks
 
         private void BuildWeaponFromSlot()
         {
-            TankConfig.WeaponSlot slot = _config.weapon;
-            if (slot.config != null)
-            {
-                _weapon = _weaponFactory.Build(slot.config, slot.levelIndex, _config.isEnemy);
-            }
+            _weapon = _weaponFactory.Build(_config.weaponConfig, _weaponLevelIndex, _config.isEnemy);
         }
 
         public void ResetForRespawn()
@@ -103,20 +100,24 @@ namespace Features.Tanks
             _weapon.Tick(deltaTime);
         }
 
-        public bool TryUpgradeWeapon()
+        public bool CanUpgradeWeapon()
         {
-            if (_config.weapon.config == null)
+            if (_config == null)
             {
                 return false;
             }
-            int max = _config.weapon.config.levels.Count - 1;
-            if (_config.weapon.levelIndex >= max)
+            if (_config.weaponConfig == null)
             {
                 return false;
             }
-            _config.weapon.levelIndex += 1;
+            int max = _config.weaponConfig.levels.Count - 1;
+            return _weaponLevelIndex < max;
+        }
+
+        public void UpgradeWeapon()
+        {
+            _weaponLevelIndex += 1;
             BuildWeaponFromSlot();
-            return true;
         }
         private void OnCollisionEnter2D(Collision2D c)
         {

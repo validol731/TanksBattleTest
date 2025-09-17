@@ -4,6 +4,7 @@ namespace Features.PowerUps
 {
     public interface IPowerUpEffect
     {
-        bool Apply(Tank target);
+        bool CanConsume(Tank target);
+        void Apply(Tank target);
     }
 }
