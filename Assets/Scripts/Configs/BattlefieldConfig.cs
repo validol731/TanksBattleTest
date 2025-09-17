@@ -13,9 +13,9 @@ namespace Configs
 
         [Header("General")]
         [SerializeField] public int enemyAmount = 4;
-        
         [SerializeField] public float moveCruiseSpeed = 2.5f;
         [SerializeField] public float respawnDelay = 1.0f;
+        [SerializeField] public float spawnWallOffset = 2f;
         
         [Header("Prefabs and configs")]
         [SerializeField] public Tank playerTankPrefab;

@@ -31,9 +31,6 @@ namespace Bootstrap
             builder.Register<IPlayerController, PlayerController>(Lifetime.Transient);
             builder.RegisterComponentInHierarchy<BattlefieldSpawner>();
             builder.RegisterComponentInHierarchy<MainMenuUI>();
-            
-            builder.Register<RespawnManager>(Lifetime.Singleton);
-
             builder.RegisterEntryPoint<GameLoop>(Lifetime.Singleton);
         }
     }
