@@ -8,7 +8,13 @@ namespace Features.Movement
         private Rigidbody2D _rigidbody;
         private TankConfig _config;
         private float _headingRad;
-
+        
+        private const float TurnDeadzoneDeg      = 2.0f;   // у цю зону не повертаємо взагалі
+        private const float TurnHysteresisDeg    = 1.0f;   // налипання: вийти з дедзони на цю величину
+        private const float AngleForFullTurnDeg  = 45.0f;  // при такій Δкут даємо |turn|=1
+                                                           
+        private bool _wasTurning;
+        private int  _stickyTurnSign; // -1/0/+1 для запобігання «перекидці» біля нуля
         public float CurrentHeadingRad => _headingRad;
 
         public void Setup(Rigidbody2D rigidbody, TankConfig config)
@@ -72,16 +78,82 @@ namespace Features.Movement
             return new Vector2(Mathf.Cos(radians), Mathf.Sin(radians));
         }
 
-        public void MoveTowardsHeading(float targetHeadingRad, float speed, float dt)
+        public void MoveTowardsHeading(float targetHeadingRad, float cruiseSpeed, float dt)
         {
-            float delta = Mathf.DeltaAngle(_headingRad * Mathf.Deg2Rad, targetHeadingRad) ;
-            float omegaMax = Mathf.Abs(speed) / Mathf.Max(0.01f, _config.turnRadius);
-            float omega = Mathf.Clamp(delta / dt, -omegaMax, omegaMax);
-            omega = Mathf.Clamp(omega, -_config.omegaMaxClamp, _config.omegaMaxClamp);
+            float currentDeg = _headingRad * Mathf.Rad2Deg;
+            float targetDeg = targetHeadingRad * Mathf.Rad2Deg;
+            float deltaDeg = Mathf.DeltaAngle(currentDeg, targetDeg);
+            float absDelta = Mathf.Abs(deltaDeg);
 
-            _headingRad += omega * dt;
-            _rigidbody.MoveRotation(_headingRad * Mathf.Rad2Deg);
-            _rigidbody.MovePosition(_rigidbody.position + Dir(_headingRad) * speed * dt);
+            bool inDeadzone = absDelta <= TurnDeadzoneDeg;
+            bool exitDead = absDelta >= (TurnDeadzoneDeg + TurnHysteresisDeg);
+
+            if (_wasTurning)
+            {
+                if (inDeadzone)
+                {
+                    _wasTurning = false;
+                    _stickyTurnSign = 0;
+                }
+            }
+            else
+            {
+                if (exitDead)
+                {
+                    _wasTurning = true;
+                    _stickyTurnSign = deltaDeg > 0f ? 1 : -1;
+                }
+            }
+
+            float turnInput = 0f;
+
+            if (_wasTurning)
+            {
+                int signNow = deltaDeg > 0f ? 1 : -1;
+                if (signNow != _stickyTurnSign && absDelta < (TurnDeadzoneDeg + TurnHysteresisDeg))
+                {
+                    deltaDeg = _stickyTurnSign * absDelta;
+                }
+                else
+                {
+                    _stickyTurnSign = signNow;
+                }
+
+                float normalized = deltaDeg / AngleForFullTurnDeg;
+                if (normalized > 1f)
+                {
+                    normalized = 1f;
+                }
+                else if (normalized < -1f)
+                {
+                    normalized = -1f;
+                }
+
+                turnInput = normalized;
+            }
+            else
+            {
+                turnInput = 0f;
+            }
+
+            float forwardInput = 1f;
+            if (_config.maxForwardSpeed > 0.0001f)
+            {
+                float desiredInput = cruiseSpeed / _config.maxForwardSpeed;
+                if (desiredInput < 0f)
+                {
+                    desiredInput = 0f;
+                }
+
+                if (desiredInput > 1f)
+                {
+                    desiredInput = 1f;
+                }
+
+                forwardInput = desiredInput;
+            }
+
+            Move(forwardInput, turnInput, dt);
         }
 
         private static Vector2 Dir(float rad)

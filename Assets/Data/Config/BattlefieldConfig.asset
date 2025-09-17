@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BattlefieldConfig
   m_EditorClassIdentifier: 
   fieldSize: {x: 15, y: 31}
-  enemyAmount: 0
+  enemyAmount: 1
   moveIntervalMin: 1.5
   moveIntervalMax: 2
   "move\u0421ruiseSpeed": 2.5

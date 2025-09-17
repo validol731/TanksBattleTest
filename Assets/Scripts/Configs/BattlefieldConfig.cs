@@ -14,9 +14,7 @@ namespace Configs
         [Header("General")]
         [SerializeField] public int enemyAmount = 4;
         
-        [SerializeField] public float moveIntervalMin = 1.5f;
-        [SerializeField] public float moveIntervalMax = 3.0f;
-        [SerializeField] public float moveСruiseSpeed = 2.5f;
+        [SerializeField] public float moveCruiseSpeed = 2.5f;
         [SerializeField] public float respawnDelay = 1.0f;
         
         [Header("Prefabs and configs")]
@@ -24,13 +22,13 @@ namespace Configs
         [SerializeField] public TankConfig playerConfig;
         
         [SerializeField] public Tank enemyTankPrefab;
-        [SerializeField] public List<TankConfig> enemyConfigs = new List<TankConfig>();
+        [SerializeField] public List<TankConfig> enemyConfigs = new();
         
         
         public Vector2 MapCenter => Vector2.zero;
         
-        public Vector2 MapMin => new Vector2(-MapWidth * 0.5f, -MapHeight * 0.5f);
-        public Vector2 MapMax => new Vector2(MapWidth * 0.5f, MapHeight * 0.5f);
+        public Vector2 MapMin => new(-MapWidth * 0.5f, -MapHeight * 0.5f);
+        public Vector2 MapMax => new(MapWidth * 0.5f, MapHeight * 0.5f);
         public float MapWidth => fieldSize.x;
         public float MapHeight => fieldSize.y;
     }

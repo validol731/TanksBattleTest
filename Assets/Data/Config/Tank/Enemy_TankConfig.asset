@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80545f1f269adc2449d463dd0aa22082, type: 3}
   m_Name: Enemy_TankConfig
   m_EditorClassIdentifier: 
+  isEnemy: 1
   image: {fileID: 21300000, guid: aece742bd1e23cf428b65a4c4a30b55e, type: 3}
   maxForwardSpeed: 4
   maxBackwardSpeed: 3

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6328712854970217388}
   - component: {fileID: 5947381835198154081}
   - component: {fileID: 6133887532460688314}
-  m_Layer: 9
+  m_Layer: 10
   m_Name: EnemyTankPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}

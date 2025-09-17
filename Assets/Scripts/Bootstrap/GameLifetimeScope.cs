@@ -22,7 +22,7 @@ namespace Bootstrap
             }
 
             builder.Register<IMovementController, SteeringMovement>(Lifetime.Transient);
-            builder.Register<IAIController, WanderAI>(Lifetime.Transient);
+            builder.Register<IAIController, SimpleAI>(Lifetime.Transient);
             builder.Register<IWeaponFactory, WeaponFactory>(Lifetime.Singleton);
             
             builder.RegisterComponentInHierarchy<KeyboardMouseTankInput>()

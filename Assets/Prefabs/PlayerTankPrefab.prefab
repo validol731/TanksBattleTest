@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: 6328712854970217388}
   - component: {fileID: 5947381835198154081}
   - component: {fileID: 4800708445407002563}
-  m_Layer: 8
+  m_Layer: 9
   m_Name: PlayerTankPrefab
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
