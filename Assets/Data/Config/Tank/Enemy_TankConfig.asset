@@ -22,5 +22,5 @@ MonoBehaviour:
   omegaMaxClamp: 2.5
   maxHp: 1
   weapon:
-    config: {fileID: 11400000, guid: a17656b05526ecd4fb67b76fd00c4c78, type: 2}
+    config: {fileID: 11400000, guid: 26c0daa800a84e94cb5777160d579837, type: 2}
     levelIndex: 0

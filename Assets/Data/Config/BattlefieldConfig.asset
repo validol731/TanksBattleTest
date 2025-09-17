@@ -13,10 +13,8 @@ MonoBehaviour:
   m_Name: BattlefieldConfig
   m_EditorClassIdentifier: 
   fieldSize: {x: 15, y: 31}
-  enemyAmount: 1
-  moveIntervalMin: 1.5
-  moveIntervalMax: 2
-  "move\u0421ruiseSpeed": 2.5
+  enemyAmount: 4
+  moveCruiseSpeed: 2.5
   respawnDelay: 1
   playerTankPrefab: {fileID: 5947381835198154081, guid: 8560c414b3c52354cb5c8101cefb2f9b, type: 3}
   playerConfig: {fileID: 11400000, guid: b25348273cd6dd74fa7992309f88913e, type: 2}

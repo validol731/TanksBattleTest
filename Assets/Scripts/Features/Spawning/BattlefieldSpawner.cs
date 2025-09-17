@@ -13,11 +13,13 @@ namespace Features.Spawning
 {
     public class BattlefieldSpawner : MonoBehaviour
     {
-        [SerializeField] private int playerCornerIndex = 0;
 
         private IObjectResolver _resolver;
         private RespawnManager _respawnManager;
         private BattlefieldConfig _battlefieldConfig;
+        
+        private int _nextCornerIndex = 0;
+        private bool _spawned;
 
         [Inject]
         public void Construct(IObjectResolver resolver, RespawnManager respawnManager, BattlefieldConfig battlefieldConfig)
@@ -27,12 +29,19 @@ namespace Features.Spawning
             _battlefieldConfig = battlefieldConfig;
         }
 
-        private void Start()
+        public void SpawnAll()
         {
+            if (_spawned)
+            {
+                return;
+            }
+
+            _spawned = true;
+            _nextCornerIndex = 0;
+
             SpawnPlayer();
             SpawnEnemies();
         }
-
         private void SpawnPlayer()
         {
             TankConfig playerConfig = _battlefieldConfig.playerConfig;
@@ -42,7 +51,7 @@ namespace Features.Spawning
                 return;
             }
 
-            Vector2 position = _respawnManager.CornerByIndex(playerCornerIndex);
+            Vector2 position = _respawnManager.CornerByIndex(_nextCornerIndex);
             Quaternion rotation = Quaternion.identity;
 
             Tank player = Instantiate(_battlefieldConfig.playerTankPrefab, position, rotation);
@@ -57,13 +66,13 @@ namespace Features.Spawning
         
         private void OnPlayerDie(Tank player)
         {
-            playerCornerIndex += 1;
-            if (playerCornerIndex > 3)
+            _nextCornerIndex += 1;
+            if (_nextCornerIndex > 3)
             {
-                playerCornerIndex = 0;
+                _nextCornerIndex = 0;
             }
 
-            Vector2 nextCorner = _respawnManager.CornerByIndex(playerCornerIndex);
+            Vector2 nextCorner = _respawnManager.CornerByIndex(_nextCornerIndex);
             _respawnManager.RespawnAfterDelay(player, nextCorner).Forget();
         }
         
