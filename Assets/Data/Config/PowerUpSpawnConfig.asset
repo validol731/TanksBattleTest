@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3dfd2dd2c54d4178bb5e9b85653a70a1, type: 3}
+  m_Name: PowerUpSpawnConfig
+  m_EditorClassIdentifier: 
+  firstSpawnDelay: 3
+  intervalRangeSeconds: {x: 6, y: 10}
+  avoidPlayer: 1
+  minDistanceFromPlayer: 4
+  items:
+  - prefab: {fileID: 8908581651245439188, guid: b0f474a0b9bc52b4393dbe8d1a387db0, type: 3}
+    maxOnField: 3
+    spawnAttemptChance: 0.5
+  - prefab: {fileID: 4035206664802827353, guid: f2f6619017c0b31438ca59bf7e338d56, type: 3}
+    maxOnField: 1
+    spawnAttemptChance: 0.25

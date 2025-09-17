@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Features.PowerUps.Config;
 using Features.Tanks;
 using Features.Tanks.Config;
 using UnityEngine;
@@ -24,6 +25,7 @@ namespace Configs
         [SerializeField] public Tank enemyTankPrefab;
         [SerializeField] public List<TankConfig> enemyConfigs = new();
         
+        [SerializeField] public PowerUpSpawnConfig powerUpSpawnConfig;
         
         public Vector2 MapCenter => Vector2.zero;
         

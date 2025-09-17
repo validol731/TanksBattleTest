@@ -8,7 +8,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - PowerUps
   - Water
   - UI
   - PlayerBullet
@@ -46,6 +46,9 @@ TagManager:
     locked: 0
   - name: Walls
     uniqueID: 448630403
+    locked: 0
+  - name: PowerUps
+    uniqueID: 3942741377
     locked: 0
   - name: Tank
     uniqueID: 3328136383

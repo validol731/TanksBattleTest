@@ -22,3 +22,4 @@ MonoBehaviour:
   enemyTankPrefab: {fileID: 1697032594009802573, guid: c4dfb8c32d6ae2548bb7228063a00eea, type: 3}
   enemyConfigs:
   - {fileID: 11400000, guid: 394dc1df3aa117045ab64d8a1212c540, type: 2}
+  powerUpSpawnConfig: {fileID: 11400000, guid: 2f98dca5846f0b54ca9031066a04bdd9, type: 2}

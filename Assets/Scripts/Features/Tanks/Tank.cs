@@ -103,24 +103,21 @@ namespace Features.Tanks
             _weapon.Tick(deltaTime);
         }
 
-        public void UpgradeWeapon()
+        public bool TryUpgradeWeapon()
         {
             if (_config.weapon.config == null)
             {
-                return;
+                return false;
             }
-
-            int maxLevelIndex = _config.weapon.config.levels.Count - 1;
-            int nextLevelIndex = _config.weapon.levelIndex + 1;
-            if (nextLevelIndex > maxLevelIndex)
+            int max = _config.weapon.config.levels.Count - 1;
+            if (_config.weapon.levelIndex >= max)
             {
-                nextLevelIndex = maxLevelIndex;
+                return false;
             }
-
-            _config.weapon.levelIndex = nextLevelIndex;
+            _config.weapon.levelIndex += 1;
             BuildWeaponFromSlot();
+            return true;
         }
-        
         private void OnCollisionEnter2D(Collision2D c)
         {
             if (c.collider.TryGetComponent<IDamageable>(out var d) && d is Tank tank)

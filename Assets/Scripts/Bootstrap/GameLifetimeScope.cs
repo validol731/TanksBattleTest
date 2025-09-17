@@ -3,6 +3,7 @@ using Features.AI;
 using Features.Combat;
 using Features.Movement;
 using Features.Player;
+using Features.PowerUps;
 using Features.Spawning;
 using MainMenu;
 using UnityEngine;
@@ -30,6 +31,7 @@ namespace Bootstrap
             builder.Register<IPlayerControllerFactory, PlayerControllerFactory>(Lifetime.Singleton);
             builder.Register<IPlayerController, PlayerController>(Lifetime.Transient);
             builder.RegisterComponentInHierarchy<BattlefieldSpawner>();
+            builder.RegisterComponentInHierarchy<PowerUpSpawner>();
             builder.RegisterComponentInHierarchy<MainMenuUI>();
             builder.RegisterEntryPoint<GameLoop>(Lifetime.Singleton);
         }

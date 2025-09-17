@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Features.PowerUps;
 using Features.Spawning;
 using TMPro;
 using UnityEngine;
@@ -22,12 +23,14 @@ namespace MainMenu
         [SerializeField] private int countdownSeconds = 3;
 
         private BattlefieldSpawner _spawner;
+        private PowerUpSpawner _powerUpSpawner;
         private bool _starting;
 
         [Inject]
-        public void Construct(BattlefieldSpawner spawner)
+        public void Construct(BattlefieldSpawner spawner, PowerUpSpawner powerUpSpawner)
         {
             _spawner = spawner;
+            _powerUpSpawner = powerUpSpawner;
         }
 
         private void Awake()
@@ -75,7 +78,12 @@ namespace MainMenu
             {
                 _spawner.SpawnAll();
             }
-
+            
+            if (_powerUpSpawner != null)
+            {
+                _powerUpSpawner.StartSpawning();
+            }
+            
             if (blurVolume != null)
             {
                 blurVolume.enabled = false;
