@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54b01874b18bf814da3c3992e4b81e43, type: 3}
   m_Name: BattlefieldConfig
   m_EditorClassIdentifier: 
-  fieldSize: {x: 15, y: 15}
+  fieldSize: {x: 15, y: 31}
   enemyAmount: 0
   moveIntervalMin: 1.5
   moveIntervalMax: 2

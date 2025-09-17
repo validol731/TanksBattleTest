@@ -1,12 +1,14 @@
 using System;
 using Features.Combat.Config;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Features.Tanks.Config
 {
     [CreateAssetMenu(menuName = "Configs/TankConfig")]
     public class TankConfig : ScriptableObject
     {
+        [SerializeField] public bool isEnemy;
         [SerializeField] public Sprite image;
         [SerializeField] public float maxForwardSpeed = 4f;
         [SerializeField] public float maxBackwardSpeed = 3f;

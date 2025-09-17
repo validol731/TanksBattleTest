@@ -4,6 +4,6 @@ namespace Features.Combat
 {
     public interface IWeaponFactory
     {
-        IWeapon Build(WeaponConfig config, int levelIndex);
+        IWeapon Build(WeaponConfig config, int levelIndex, bool isEnemy);
     }
 }

@@ -66,7 +66,7 @@ namespace Features.Tanks
             TankConfig.WeaponSlot slot = _config.weapon;
             if (slot.config != null)
             {
-                _weapon = _weaponFactory.Build(slot.config, slot.levelIndex);
+                _weapon = _weaponFactory.Build(slot.config, slot.levelIndex, _config.isEnemy);
             }
         }
 

@@ -17,8 +17,8 @@ MonoBehaviour:
   levels:
   - bulletSpeed: 10
     bulletLife: 15
-    cooldown: 2
+    cooldown: 0.01
     projectilesPerShot: 1
-    spreadDeg: 1
+    spreadDeg: 5
     bulletPrefab: {fileID: 8147266638412925376, guid: f41eb63c06c77474685ad3c5b89acd34, type: 3}
     damage: 1

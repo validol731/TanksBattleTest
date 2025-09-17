@@ -1,4 +1,6 @@
 using Cysharp.Threading.Tasks;
+using Features.Combat.Config;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -6,21 +8,29 @@ namespace Features.Combat.WeaponEntities
 {
     public class SimpleGun : IWeapon
     {
-        private WeaponRuntimeConfig _config;
+        private WeaponConfig.WeaponLevel _config;
         private ObjectPool<Bullet> _pool;
         private float _cooldown;
 
-        public void Setup(WeaponRuntimeConfig config)
+        public void Setup(WeaponConfig.WeaponLevel config, bool isEnemy)
         {
             _config = config;
+            var prefab = config.playerBulletPrefab;
+            if (isEnemy)
+            {
+                prefab = config.enemyBulletPrefab;
+            }
             _pool = new ObjectPool<Bullet>(
-                () => GameObject.Instantiate(_config.BulletPrefab).GetComponent<Bullet>(),
+                () => GameObject.Instantiate(prefab).GetComponent<Bullet>(),
                 b => b.gameObject.SetActive(true),
                 b => b.gameObject.SetActive(false),
                 defaultCapacity: 16);
         }
 
-        public void Tick(float dt) { _cooldown = Mathf.Max(0, _cooldown - dt); }
+        public void Tick(float dt)
+        {
+            _cooldown = Mathf.Max(0, _cooldown - dt);
+        }
 
         public void TryFire(Vector2 pos, float headingRad)
         {
@@ -28,28 +38,33 @@ namespace Features.Combat.WeaponEntities
             {
                 return;
             }
-            _cooldown = _config.Cooldown;
+            _cooldown = _config.cooldown;
 
-            int n = Mathf.Max(1, _config.ProjectilesPerShot);
-            float spread = _config.SpreadDeg;
-            for (int i = 0; i < n; i++)
+            int projectileCount = Mathf.Max(1, _config.projectilesPerShot);
+            float totalSpreadDegrees = _config.spreadDeg;
+
+            for (int i = 0; i < projectileCount; i++)
             {
-                float t = 0f;
-                if (n != 1)
-                {
-                    t = Mathf.Lerp(-spread * 0.5f, spread * 0.5f, i / (float)(n - 1));
-                }
-                float rad = headingRad + t * Mathf.Deg2Rad;
+                float spreadOffsetDegrees = 0f;
 
+                if (projectileCount != 1)
+                {
+                    float t = i / (float)(projectileCount - 1);
+                    float min = -totalSpreadDegrees * 0.5f;
+                    float max =  totalSpreadDegrees * 0.5f;
+                    spreadOffsetDegrees = Mathf.Lerp(min, max, t);
+                }
+
+                float shotRadians = headingRad + spreadOffsetDegrees * Mathf.Deg2Rad;
                 var bullet = _pool.Get();
-                bullet.Launch(pos, rad, _config.BulletSpeed, _config.Damage, () => ReleaseBullet(bullet));
+                bullet.Launch(pos, shotRadians, _config.bulletSpeed, _config.damage, () => ReleaseBullet(bullet));
                 ReleaseBulletDelay(bullet).Forget();
             }
         }
 
         private async UniTask ReleaseBulletDelay(Bullet bullet)
         {
-            await UniTask.Delay((int)(_config.BulletLife * 1000));
+            await UniTask.Delay((int)(_config.bulletLife * 1000));
             ReleaseBullet(bullet);
         }
         private void ReleaseBullet(Bullet bullet)

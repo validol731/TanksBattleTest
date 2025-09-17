@@ -28,7 +28,8 @@ namespace Features.Combat.Config
             public float spreadDeg;
 
             [Header("Assets")]
-            public GameObject bulletPrefab;
+            public GameObject playerBulletPrefab;
+            public GameObject enemyBulletPrefab;
 
             [Header("Damage")]
             public int damage;
