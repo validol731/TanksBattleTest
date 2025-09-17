@@ -24,6 +24,7 @@ namespace Features.Tanks
         private readonly Subject<Tank> _diedSubject = new();
         public IObservable<Tank> Died => _diedSubject;
         public IMovementController Movement => _movementController;
+        public bool IsEnemy => _config.isEnemy;
 
         [Inject]
         public void Construct(IMovementController movementController, IWeaponFactory weaponFactory)
@@ -114,6 +115,18 @@ namespace Features.Tanks
             _config.weapon.levelIndex = nextLevelIndex;
             BuildWeaponFromSlot();
         }
+        
+        private void OnCollisionEnter2D(Collision2D c)
+        {
+            if (c.collider.TryGetComponent<IDamageable>(out var d) && d is Tank tank)
+            {
+                if (tank.IsEnemy && !IsEnemy)
+                {
+                    TakeHit(_state.Hp.Value);
+                }
+            }
+        }
+
 
         public void TakeHit(int damage)
         {

@@ -15,7 +15,7 @@ namespace Features.AI
 
         private Tank _tank;
         private Rigidbody2D _rigidbody2D;
-        private CompositeDisposable _disposables = new();
+        private readonly CompositeDisposable _disposables = new();
 
         [Inject]
         public void Construct(IAIController aiController, BattlefieldConfig battlefieldConfig)

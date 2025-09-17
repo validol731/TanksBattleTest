@@ -27,20 +27,21 @@ namespace Features.AI
 
         public bool HasPlayer => _playerTransform != null;
         
-        private float _seekRepathInterval = 1f;
-        private float _seekJitterRadius = 16f;        
-        private float _seekMinJitter = 6f;           
-        private float _seekTargetMinDistance = 2.0f;   
-        private float _arriveRadius = 1.0f;            
+        private readonly float _seekRepathInterval = 1f;
+        private readonly float _seekJitterRadius = 16f;        
+        private readonly float _seekMinJitter = 6f;           
+        private readonly float _seekTargetMinDistance = 2.0f;   
+        private readonly float _arriveRadius = 1.0f;            
 
         
-        private float _engageRadius = 8.0f;
-        private float _engageRepathInterval = 1f;
-        private float _stopAndAimDistance = 5.0f;
-        private float _fireAngleToleranceDeg = 6.0f;
-        private bool  _useLineOfSight = true;
+        private readonly float _engageRadius = 8.0f;
+        private readonly float _engageRepathInterval = 1f;
+        private readonly float _stopAndAimDistance = 5.0f;
+        private readonly float _fireAngleToleranceDeg = 6.0f;
+        private readonly bool  _useLineOfSight = true;
 
-        private float _brakeBeforeFireSeconds = 0.15f;
+        private readonly float _brakeBeforeFireSeconds = 0.15f;
+        private readonly float _boundsInset = 0.64f;
 
         public bool InEngage
         {
@@ -127,6 +128,16 @@ namespace Features.AI
             }
         }
 
+        private Vector2 ClampInsideBoundsWithInset(Vector2 p)
+        {
+            Vector2 min = _config.MapMin + new Vector2(_boundsInset, _boundsInset);
+            Vector2 max = _config.MapMax - new Vector2(_boundsInset, _boundsInset);
+
+            float x = Mathf.Clamp(p.x, min.x, max.x);
+            float y = Mathf.Clamp(p.y, min.y, max.y);
+
+            return new Vector2(x, y);
+        }
         public void OnCollision()
         {
             float add = Random.Range(Mathf.Deg2Rad * 120f, Mathf.Deg2Rad * 170f);
@@ -168,11 +179,9 @@ namespace Features.AI
             {
                 float step = Random.Range(_seekMinJitter, _seekJitterRadius);
                 Vector2 dir = Random.insideUnitCircle.normalized;
-                candidate = basePoint + dir * step;
 
-                float clampedX = Mathf.Clamp(candidate.x, mapMin.x, mapMax.x);
-                float clampedY = Mathf.Clamp(candidate.y, mapMin.y, mapMax.y);
-                candidate = new Vector2(clampedX, clampedY);
+                candidate = basePoint + dir * step;
+                candidate = ClampInsideBoundsWithInset(candidate);
 
                 float distance = Vector2.Distance(candidate, currentPos);
                 if (distance >= _seekTargetMinDistance)
@@ -194,6 +203,8 @@ namespace Features.AI
                 {
                     candidate = currentPos + new Vector2(_seekTargetMinDistance, 0f);
                 }
+
+                candidate = ClampInsideBoundsWithInset(candidate);
             }
 
             _seekTarget = candidate;
