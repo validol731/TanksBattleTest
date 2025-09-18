@@ -7,7 +7,9 @@ using Configs;
 using Features.Tanks;
 using Features.Tanks.Config;
 using Features.AI;
+using Features.AI.Config;
 using Features.Player;
+using Features.Score;
 using VContainer.Unity;
 
 namespace Features.Spawning
@@ -24,13 +26,15 @@ namespace Features.Spawning
         private bool _spawned;
 
         private Tank _player;
-        private readonly List<Tank> _enemies = new List<Tank>(32);
+        private readonly List<Tank> _enemies = new(32);
+        private IScoreService _score;
 
         [Inject]
-        public void Construct(IObjectResolver resolver, BattlefieldConfig config)
+        public void Construct(IObjectResolver resolver, BattlefieldConfig config, IScoreService score)
         {
             _resolver = resolver;
             _config = config;
+            _score = score;
         }
 
         public void SpawnAll()
@@ -79,18 +83,21 @@ namespace Features.Spawning
 
         private void OnPlayerDie(Tank player)
         {
+            if (_score != null)
+            {
+                _score.ResetRun();
+            }
+            
             Vector2 bestCorner = CornerByIndex(_nextCornerIndex);
-            float bestScore = -1f;
+            float bestDistance = -1f;
 
             for (int i = 0; i < 4; i++)
             {
                 Vector2 corner = CornerByIndex(i);
                 float distEnemies = MinDistanceToActiveEnemies(corner);
-                float score = distEnemies;
-
-                if (score > bestScore)
+                if (distEnemies > bestDistance)
                 {
-                    bestScore = score;
+                    bestDistance = distEnemies;
                     bestCorner = corner;
                 }
             }
@@ -145,7 +152,7 @@ namespace Features.Spawning
                     _resolver.InjectGameObject(enemy.gameObject);
                     enemy.Initialize(pack.tankConfig);
 
-                    Vector2 toCenter = (_config.MapCenter - position).normalized;
+                    Vector2 toCenter = (_config.mapCenter - position).normalized;
                     float headingDegrees = Mathf.Atan2(toCenter.y, toCenter.x) * Mathf.Rad2Deg;
                     enemy.transform.rotation = Quaternion.Euler(0f, 0f, headingDegrees);
 
@@ -161,8 +168,34 @@ namespace Features.Spawning
 
         private void OnEnemyDie(Tank enemy)
         {
+            if (_score != null)
+            {
+                _score.Add(enemy.ScoreOnKill, "EnemyKill");
+            }
             Vector2 newPosition = FindBorderPointSafe(_minSpawnDistanceFromPlayer, _minSpawnDistanceFromEnemies, 32);
             RespawnAfterDelay(enemy, newPosition).Forget();
+        }
+        
+        public void DespawnAll()
+        {
+            if (_player != null)
+            {
+                Destroy(_player.gameObject);
+                _player = null;
+            }
+
+            for (int i = 0; i < _enemies.Count; i++)
+            {
+                Tank e = _enemies[i];
+                if (e != null)
+                {
+                    Destroy(e.gameObject);
+                }
+            }
+            _enemies.Clear();
+
+            _spawned = false;
+            _nextCornerIndex = 0;
         }
 
         public async UniTask RespawnAfterDelay(Tank tank, Vector2 position)

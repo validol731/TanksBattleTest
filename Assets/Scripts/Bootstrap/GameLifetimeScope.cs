@@ -4,8 +4,9 @@ using Features.Combat;
 using Features.Movement;
 using Features.Player;
 using Features.PowerUps;
+using Features.Score;
 using Features.Spawning;
-using MainMenu;
+using UI;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -24,6 +25,7 @@ namespace Bootstrap
             }
 
             builder.Register<IMovementController, SteeringMovement>(Lifetime.Transient);
+            builder.Register<ScoreService>(Lifetime.Singleton).As<IScoreService>();
             builder.Register<IAIController, SimpleAI>(Lifetime.Transient);
             builder.Register<IWeaponFactory, WeaponFactory>(Lifetime.Singleton);
             
@@ -32,8 +34,16 @@ namespace Bootstrap
             builder.Register<IPlayerController, PlayerController>(Lifetime.Transient);
             builder.RegisterComponentInHierarchy<BattlefieldSpawner>();
             builder.RegisterComponentInHierarchy<PowerUpSpawner>();
-            builder.RegisterComponentInHierarchy<MainMenuUI>();
-            builder.RegisterEntryPoint<GameLoop>(Lifetime.Singleton);
+            
+            builder.RegisterComponentInHierarchy<GameMenusController>();
+            builder.RegisterBuildCallback(container =>
+            {
+                foreach (var view in FindObjectsOfType<MenuView>(true))
+                {
+                    container.Inject(view);
+                }
+            });
+            builder.RegisterEntryPoint<GameLoop>();
         }
     }
     

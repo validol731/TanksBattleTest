@@ -22,5 +22,8 @@ namespace Features.AI.Config
         [Header("Per-instance variance")]
         [Range(0f, 0.5f)] public float randomizePercent = 0.10f;
         [Range(0, 2)]    public int   lootPriorityJitter = 1;
+        
+        [Header("Score")]
+        public int scoreOnKill = 100; 
     }
 }

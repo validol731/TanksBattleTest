@@ -46,7 +46,7 @@ namespace Core
 
             float width = SnapToGrid(battlefieldConfig.MapWidth);
             float height = SnapToGrid(battlefieldConfig.MapHeight);
-            Vector2 center = battlefieldConfig.MapCenter;
+            Vector2 center = battlefieldConfig.mapCenter;
 
             float wallThickness = wallThicknessInTiles * tileSize;
 
@@ -75,13 +75,13 @@ namespace Core
             SetTiledSize(right, wallThickness, height + wallThickness * 2f, hasCollider: true);
 
             // Bottom
-            Vector2 bottomPos = new Vector2(center.x, battlefieldConfig.MapMin.y - wallPossOffset);
+            Vector2 bottomPos = new Vector2(center.x, battlefieldConfig.MapMin.y - Mathf.Abs(center.y) - wallPossOffset);
             GameObject bottom = FindOrCreateChild(BottomWallName, wallPrefab, wallsLayer);
             SetTransform(bottom.transform, bottomPos, 0f);
             SetTiledSize(bottom, width + wallThickness * 2f, wallThickness, hasCollider: true);
 
             // Top
-            Vector2 topPos = new Vector2(center.x, battlefieldConfig.MapMax.y + wallPossOffset);
+            Vector2 topPos = new Vector2(center.x, battlefieldConfig.MapMax.y + center.y + wallPossOffset);
             GameObject top = FindOrCreateChild(TopWallName, wallPrefab, wallsLayer);
             SetTransform(top.transform, topPos, 0f);
             SetTiledSize(top, width + wallThickness * 2f, wallThickness, hasCollider: true);

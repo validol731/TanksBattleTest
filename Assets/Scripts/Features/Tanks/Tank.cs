@@ -1,4 +1,5 @@
 using System;
+using Features.AI.Config;
 using Features.Combat;
 using Features.Movement;
 using Features.Tanks.Config;
@@ -31,6 +32,19 @@ namespace Features.Tanks
         public float RespawnDelay => _config.respawnDelay;
         private bool IsEnemy => _config.IsEnemy;
         private int _weaponLevelIndex = 0;
+        public int ScoreOnKill
+        {
+            get
+            {
+                var config = (AITankConfig)_config;
+                if (config != null)
+                {
+                    return config.scoreOnKill;
+                }
+
+                return 0;
+            }
+        }
 
         [Inject]
         public void Construct(IMovementController movementController, IWeaponFactory weaponFactory)

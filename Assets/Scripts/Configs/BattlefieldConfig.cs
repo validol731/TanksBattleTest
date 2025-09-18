@@ -5,6 +5,7 @@ using Features.PowerUps.Config;
 using Features.Tanks;
 using Features.Tanks.Config;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Configs
 {
@@ -13,6 +14,7 @@ namespace Configs
     {
         [Header("Map Setup")]
         [SerializeField] private Vector2 fieldSize= new(16,16);
+        [SerializeField] public Vector2 mapCenter = Vector2.zero;
         [SerializeField] public float spawnWallOffset = 2f;
 
         [Header("General")]
@@ -28,7 +30,6 @@ namespace Configs
         [Header("Power Ups")]
         [SerializeField] public PowerUpSpawnConfig powerUpSpawnConfig;
         
-        public Vector2 MapCenter => Vector2.zero;
         
         public Vector2 MapMin => new(-MapWidth * 0.5f, -MapHeight * 0.5f);
         public Vector2 MapMax => new(MapWidth * 0.5f, MapHeight * 0.5f);

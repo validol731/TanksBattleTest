@@ -94,7 +94,6 @@ namespace Features.PowerUps
                             continue;
                         }
 
-                        // === НОВЕ: перевіряємо “чи є кому ймовірно підняти” з урахуванням desire ===
                         if (!ExistsEligibleTakerWithChance(entry, 0.05f))
                         {
                             continue;
@@ -302,6 +301,25 @@ namespace Features.PowerUps
                 return null;
             }
             return go.transform;
+        }
+
+        public void DespawnAllPowerUps()
+        {
+            for (int i = 0; i < _aliveInstances.Count; i++)
+            {
+                PowerUpBase p = _aliveInstances[i];
+                if (p != null)
+                {
+                    Destroy(p.gameObject);
+                }
+            }
+            _aliveInstances.Clear();
+
+            var keys = new List<PowerUpEntry>(_alivePerEntry.Keys);
+            for (int i = 0; i < keys.Count; i++)
+            {
+                _alivePerEntry[keys[i]] = 0;
+            }
         }
     }
 }

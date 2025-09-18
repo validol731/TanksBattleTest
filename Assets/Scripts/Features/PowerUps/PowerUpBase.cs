@@ -1,7 +1,9 @@
 ﻿using System;
+using Features.Score;
 using UniRx;
 using UnityEngine;
 using Features.Tanks;
+using VContainer;
 
 namespace Features.PowerUps
 {
@@ -9,6 +11,7 @@ namespace Features.PowerUps
     public abstract class PowerUpBase : MonoBehaviour, IPowerUpEffect
     {
         [SerializeField] private int aiPriority = 0;
+        [SerializeField] private int scoreOnPickup = 50;
 
         [Header("VFX (optional)")]
         [SerializeField] private GameObject pickupVfxPrefab;
@@ -20,6 +23,13 @@ namespace Features.PowerUps
         private bool _allowPlayerPickup = true;
         private bool _allowEnemyPickup  = false;
 
+        private IScoreService _score;
+
+        [Inject]
+        public void Construct(IScoreService score)
+        {
+            _score = score;
+        }
         protected virtual void Reset()
         {
             Collider2D c = GetComponent<Collider2D>();
@@ -66,6 +76,12 @@ namespace Features.PowerUps
             if (CanConsume(tank))
             {
                 Apply(tank);
+                
+                if (_score != null && scoreOnPickup > 0)
+                {
+                    _score.Add(scoreOnPickup, "PowerUp:" + GetType().Name);
+                }
+                
                 DestroyPowerUp();
             }
         }

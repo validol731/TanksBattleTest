@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Features.PowerUps;
+using Features.Score;
 using Features.Spawning;
 using TMPro;
 using UnityEngine;
@@ -7,59 +8,74 @@ using UnityEngine.Rendering;
 using UnityEngine.UI;
 using VContainer;
 
-namespace MainMenu
+namespace UI
 {
-    public class MainMenuUI : MonoBehaviour
+    public class MainMenuUI : MenuView
     {
+        protected override GameMenuType Type => GameMenuType.MainMenu;
+
         [Header("UI")]
-        [SerializeField] private GameObject panelRoot;
         [SerializeField] private Button startButton;
         [SerializeField] private TMP_Text countdownText;
-
-        [Header("PostProcessing (optional)")]
-        [SerializeField] private Volume blurVolume;
+        [SerializeField] private BestScoreLabel bestScoreLabel;
 
         [Header("Countdown")]
         [SerializeField] private int countdownSeconds = 3;
 
+        [Header("PostProcessing (optional)")]
+        [SerializeField] private Volume blurVolume;
+
         private BattlefieldSpawner _spawner;
-        private PowerUpSpawner _powerUpSpawner;
+        private PowerUpSpawner _powerUps;
+
         private bool _starting;
 
         [Inject]
-        public void Construct(BattlefieldSpawner spawner, PowerUpSpawner powerUpSpawner)
+        public void Construct(GameMenusController controller, IScoreService score, BattlefieldSpawner spawner, PowerUpSpawner powerUps)
         {
             _spawner = spawner;
-            _powerUpSpawner = powerUpSpawner;
+            _powerUps = powerUps;
+            Score = score;
+            Controller = controller;
         }
 
         private void Awake()
         {
-            if (panelRoot != null)
-            {
-                panelRoot.SetActive(true);
-            }
-            if (countdownText != null)
-            {
-                countdownText.gameObject.SetActive(false);
-            }
-            if (blurVolume != null)
-            {
-                blurVolume.enabled = true;
-            }
-
-            if (startButton != null)
-            {
-                startButton.onClick.AddListener(OnStartClicked);
-            }
+            countdownText.gameObject.SetActive(false);
+            startButton.gameObject.SetActive(true);
+            bestScoreLabel.gameObject.SetActive(true);
+            startButton.onClick.AddListener(OnStartClicked);
+            bestScoreLabel.Initialize(Score);
         }
 
         private void OnDestroy()
         {
-            if (startButton != null)
+            startButton.onClick.RemoveListener(OnStartClicked);
+        }
+
+        protected override void OnShown()
+        {
+            if (blurVolume != null)
             {
-                startButton.onClick.RemoveListener(OnStartClicked);
+                blurVolume.enabled = true;
             }
+            Time.timeScale = 0f;
+            startButton.gameObject.SetActive(true);
+            bestScoreLabel.ChangeState(true);
+
+            _powerUps?.StopSpawning();
+            _powerUps?.DespawnAllPowerUps();
+            _spawner?.DespawnAll();
+            Score?.ResetRun();
+        }
+
+        protected override void OnHidden()
+        {
+            if (blurVolume != null)
+            {
+                blurVolume.enabled = false;
+            }
+            Time.timeScale = 1f;
         }
 
         private void OnStartClicked()
@@ -68,54 +84,31 @@ namespace MainMenu
             {
                 return;
             }
+
             _starting = true;
-            StartGameFlow().Forget();
+            StartFlow().Forget();
         }
 
-        private async UniTaskVoid StartGameFlow()
+        private async UniTaskVoid StartFlow()
         {
-            if (_spawner != null)
-            {
-                _spawner.SpawnAll();
-            }
-            
-            if (_powerUpSpawner != null)
-            {
-                _powerUpSpawner.StartSpawning();
-            }
-            
-            if (blurVolume != null)
-            {
-                blurVolume.enabled = false;
-            }
+            _spawner?.SpawnAll();
+            _powerUps?.StartSpawning();
+            startButton.gameObject.SetActive(false);
+            bestScoreLabel.ChangeState(false);
 
-            Time.timeScale = 0f;
-
-            if (countdownText != null)
+            countdownText.gameObject.SetActive(true);
+            for (int t = countdownSeconds; t >= 1; t--)
             {
-                countdownText.gameObject.SetActive(true);
-                for (int t = countdownSeconds; t >= 1; t--)
-                {
-                    countdownText.text = t.ToString();
-                    await UniTask.Delay(1000, ignoreTimeScale: true);
-                }
-
-                countdownText.text = "GO!";
-                await UniTask.Delay(500, ignoreTimeScale: true);
-                countdownText.gameObject.SetActive(false);
+                countdownText.text = t.ToString();
+                await UniTask.Delay(1000, ignoreTimeScale: true);
             }
+            countdownText.text = "GO!";
+            await UniTask.Delay(500, ignoreTimeScale: true);
+            countdownText.gameObject.SetActive(false);
 
-            if (panelRoot != null)
-            {
-                panelRoot.SetActive(false);
-            }
+            Controller?.SetMenu(GameMenuType.Game);
 
-            if (startButton != null)
-            {
-                startButton.gameObject.SetActive(false);
-            }
-
-            Time.timeScale = 1f;
+            _starting = false;
         }
     }
 }
