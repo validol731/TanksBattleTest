@@ -3,10 +3,9 @@ using Features.AI.Config;
 using Features.Combat;
 using Features.Movement;
 using Features.Tanks.Config;
-using Features.UI;
+using UI.Tanks;
 using UniRx;
 using UnityEngine;
-using UnityEngine.UI;
 using VContainer;
 
 namespace Features.Tanks

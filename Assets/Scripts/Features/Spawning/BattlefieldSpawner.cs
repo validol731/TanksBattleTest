@@ -7,9 +7,9 @@ using Configs;
 using Features.Tanks;
 using Features.Tanks.Config;
 using Features.AI;
-using Features.AI.Config;
 using Features.Player;
 using Features.Score;
+using UI.Score;
 using VContainer.Unity;
 
 namespace Features.Spawning
@@ -28,13 +28,15 @@ namespace Features.Spawning
         private Tank _player;
         private readonly List<Tank> _enemies = new(32);
         private IScoreService _score;
+        private IScorePopupService _scorePopupService;
 
         [Inject]
-        public void Construct(IObjectResolver resolver, BattlefieldConfig config, IScoreService score)
+        public void Construct(IObjectResolver resolver, BattlefieldConfig config, IScoreService score, IScorePopupService scorePopupService)
         {
             _resolver = resolver;
             _config = config;
             _score = score;
+            _scorePopupService = scorePopupService;
         }
 
         public void SpawnAll()
@@ -171,6 +173,7 @@ namespace Features.Spawning
             if (_score != null)
             {
                 _score.Add(enemy.ScoreOnKill, "EnemyKill");
+                _scorePopupService.Show(enemy.ScoreOnKill, enemy.transform.position, new Color(1f, 0.85f, 0.2f));
             }
             Vector2 newPosition = FindBorderPointSafe(_minSpawnDistanceFromPlayer, _minSpawnDistanceFromEnemies, 32);
             RespawnAfterDelay(enemy, newPosition).Forget();

@@ -7,6 +7,8 @@ using Features.PowerUps;
 using Features.Score;
 using Features.Spawning;
 using UI;
+using UI.Menu;
+using UI.Score;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -25,6 +27,7 @@ namespace Bootstrap
             }
 
             builder.Register<IMovementController, SteeringMovement>(Lifetime.Transient);
+            builder.RegisterComponentInHierarchy<GameMenuUI>().As<IScorePopupService>();
             builder.Register<ScoreService>(Lifetime.Singleton).As<IScoreService>();
             builder.Register<IAIController, SimpleAI>(Lifetime.Transient);
             builder.Register<IWeaponFactory, WeaponFactory>(Lifetime.Singleton);

@@ -1,6 +1,5 @@
 ﻿using Features.Tanks;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Features.PowerUps.PowerUpsEntities
 {

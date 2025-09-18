@@ -1,10 +1,9 @@
-﻿// Features/UI/HeartsView2D.cs
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Features.Tanks;
 using UniRx;
 using UnityEngine;
-using Features.Tanks;
 
-namespace Features.UI
+namespace UI.Tanks
 {
     public class HeartsView2D : MonoBehaviour
     {

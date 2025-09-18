@@ -9,12 +9,12 @@ namespace Features.Movement
         private TankConfig _config;
         private float _headingRad;
         
-        private const float TurnDeadzoneDeg      = 2.0f;   // у цю зону не повертаємо взагалі
-        private const float TurnHysteresisDeg    = 1.0f;   // налипання: вийти з дедзони на цю величину
-        private const float AngleForFullTurnDeg  = 45.0f;  // при такій Δкут даємо |turn|=1
+        private const float TurnDeadzoneDeg      = 2.0f;
+        private const float TurnHysteresisDeg    = 1.0f;
+        private const float AngleForFullTurnDeg  = 45.0f;
                                                            
         private bool _wasTurning;
-        private int  _stickyTurnSign; // -1/0/+1 для запобігання «перекидці» біля нуля
+        private int  _stickyTurnSign;
         public float CurrentHeadingRad => _headingRad;
 
         public void Setup(Rigidbody2D rigidbody, TankConfig config)

@@ -5,7 +5,6 @@ using Features.PowerUps.Config;
 using Features.Tanks;
 using Features.Tanks.Config;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Configs
 {

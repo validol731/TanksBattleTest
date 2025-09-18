@@ -1551,10 +1551,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fd11f5fd237040a0af313d58ee674ebe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvasRectTransform: {fileID: 972849059}
   canvasGroup: {fileID: 972849055}
   exitButton: {fileID: 157232832}
   bestScoreLabel: {fileID: 972849053}
   scoreLabel: {fileID: 972849052}
+  popupUiPrefab: {fileID: 4578577618843671061, guid: c4a8fcc1368b8e2408341c1ea664ee12, type: 3}
+  popupWorldRoot: {fileID: 1016879100}
 --- !u!225 &972849055
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1643,6 +1646,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 227370484}
+  - {fileID: 1016879100}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1650,6 +1654,41 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1016879099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1016879100}
+  m_Layer: 5
+  m_Name: ScorePopupsRoot
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1016879100
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1016879099}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 972849059}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1106188904
 GameObject:
   m_ObjectHideFlags: 0
@@ -2444,6 +2483,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6223e3c136ad46f688f0cfc0f85c11f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvasRectTransform: {fileID: 2081385434}
   canvasGroup: {fileID: 2081385436}
   startButton: {fileID: 1481278560}
   countdownText: {fileID: 239560890}

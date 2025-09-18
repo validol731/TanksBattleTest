@@ -3,6 +3,7 @@ using Features.Score;
 using UniRx;
 using UnityEngine;
 using Features.Tanks;
+using UI.Score;
 using VContainer;
 
 namespace Features.PowerUps
@@ -24,11 +25,13 @@ namespace Features.PowerUps
         private bool _allowEnemyPickup  = false;
 
         private IScoreService _score;
+        private IScorePopupService _scorePopupService;
 
         [Inject]
-        public void Construct(IScoreService score)
+        public void Construct(IScoreService score, IScorePopupService scorePopupService)
         {
             _score = score;
+            _scorePopupService = scorePopupService;
         }
         protected virtual void Reset()
         {
@@ -80,6 +83,10 @@ namespace Features.PowerUps
                 if (_score != null && scoreOnPickup > 0)
                 {
                     _score.Add(scoreOnPickup, "PowerUp:" + GetType().Name);
+                    if (isPlayer)
+                    {
+                        _scorePopupService.Show(scoreOnPickup, transform.position, new Color(0.3f, 1f, 0.4f));
+                    }
                 }
                 
                 DestroyPowerUp();

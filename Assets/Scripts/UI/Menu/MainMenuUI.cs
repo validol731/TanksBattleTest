@@ -3,12 +3,13 @@ using Features.PowerUps;
 using Features.Score;
 using Features.Spawning;
 using TMPro;
+using UI.Score;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 using VContainer;
 
-namespace UI
+namespace UI.Menu
 {
     public class MainMenuUI : MenuView
     {

@@ -1,7 +1,7 @@
 ﻿using UniRx;
 using UnityEngine;
 
-namespace UI
+namespace UI.Menu
 {
     public enum GameMenuType
     {

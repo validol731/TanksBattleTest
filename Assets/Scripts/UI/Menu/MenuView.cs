@@ -1,13 +1,13 @@
 ﻿using Features.Score;
 using UniRx;
 using UnityEngine;
-using VContainer;
 
-namespace UI
+namespace UI.Menu
 {
     public abstract class MenuView : MonoBehaviour
     {
         [Header("Visual Root")]
+        [SerializeField] protected RectTransform canvasRectTransform;
         [SerializeField] private CanvasGroup canvasGroup;
 
         protected abstract GameMenuType Type { get; }

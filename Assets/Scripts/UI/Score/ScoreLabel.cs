@@ -2,9 +2,8 @@
 using TMPro;
 using UniRx;
 using UnityEngine;
-using VContainer;
 
-namespace UI
+namespace UI.Score
 {
     public class ScoreLabel : MonoBehaviour
     {
