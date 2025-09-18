@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4479556658267638584}
   - component: {fileID: 8230195805816324958}
   - component: {fileID: 4035206664802827353}
+  - component: {fileID: 3236017875770744350}
   m_Layer: 3
   m_Name: WeaponUpgradePowerUpPrefab
   m_TagString: Untagged
@@ -144,5 +145,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aiPriority: 5
+  scoreOnPickup: 50
   pickupVfxPrefab: {fileID: 0}
   vfxLifetime: 1
+--- !u!114 &3236017875770744350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4522115336110833132}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5deddefcc1427dacf17a06343fc990, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amplitude: 0.25
+  period: 1.6
+  ease: 4
+  useLocal: 1
+  randomPhase01: 0.5
