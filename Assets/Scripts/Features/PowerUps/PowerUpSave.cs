@@ -20,7 +20,7 @@ namespace Features.PowerUps
             {
                 PowerUpSave s = new PowerUpSave();
                 s.position = powerUp.transform.position;
-                s.id = powerUp.id;
+                s.id = powerUp.currentConfig.id;
                 save.PowerUps.Add(s);
             }
         }

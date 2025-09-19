@@ -1,4 +1,5 @@
 ﻿using System;
+using Features.PowerUps.Config;
 using Features.Score;
 using UniRx;
 using UnityEngine;
@@ -11,7 +12,6 @@ namespace Features.PowerUps
     [RequireComponent(typeof(Collider2D))]
     public abstract class PowerUpBase : MonoBehaviour, IPowerUpEffect
     {
-        [SerializeField] public string id;
         [SerializeField] private int aiPriority = 0;
         [SerializeField] private int scoreOnPickup = 50;
 
@@ -22,12 +22,17 @@ namespace Features.PowerUps
         private readonly Subject<PowerUpBase> _collected = new Subject<PowerUpBase>();
         public IObservable<PowerUpBase> Collected => _collected;
 
-        private bool _allowPlayerPickup = true;
-        private bool _allowEnemyPickup  = false;
+        public PowerUpEntry currentConfig;
+        private bool AllowPlayerPickup => currentConfig.allowPlayerPickup;
+        private bool AllowEnemyPickup  => currentConfig.allowEnemyPickup;
 
         private IScoreService _score;
         private IScorePopupService _scorePopupService;
 
+        public void Initialize(PowerUpEntry config)
+        {
+            currentConfig = config;
+        }
         [Inject]
         public void Construct(IScoreService score, IScorePopupService scorePopupService)
         {
@@ -43,11 +48,6 @@ namespace Features.PowerUps
             }
         }
 
-        public void ConfigurePickupPermissions(bool allowPlayer, bool allowEnemy)
-        {
-            _allowPlayerPickup = allowPlayer;
-            _allowEnemyPickup = allowEnemy;
-        }
 
         public int GetAiPriority(Tank tank)
         {
@@ -68,11 +68,11 @@ namespace Features.PowerUps
             }
 
             bool isPlayer = tank.gameObject.CompareTag("Player");
-            if (isPlayer && !_allowPlayerPickup)
+            if (isPlayer && !AllowPlayerPickup)
             {
                 return;
             }
-            if (!isPlayer && !_allowEnemyPickup)
+            if (!isPlayer && !AllowEnemyPickup)
             {
                 return;
             }
@@ -104,14 +104,14 @@ namespace Features.PowerUps
             bool isPlayer = tank.gameObject.CompareTag("Player");
             if (isPlayer)
             {
-                if (_allowPlayerPickup)
+                if (AllowPlayerPickup)
                 {
                     return true;
                 }
                 return false;
             }
 
-            if (_allowEnemyPickup)
+            if (AllowEnemyPickup)
             {
                 return true;
             }

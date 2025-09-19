@@ -127,7 +127,7 @@ namespace Features.PowerUps
         {
             PowerUpBase instance = Instantiate(entry.prefab, position, Quaternion.identity);
             _resolver.InjectGameObject(instance.gameObject);
-            instance.ConfigurePickupPermissions(entry.allowPlayerPickup, entry.allowEnemyPickup);
+            instance.Initialize(entry);
             instance.Collected.Subscribe(_ => OnCollected(entry, instance)).AddTo(instance);
 
             _aliveInstances.Add(instance);

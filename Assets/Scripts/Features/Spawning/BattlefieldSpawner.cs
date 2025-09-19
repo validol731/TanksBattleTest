@@ -24,7 +24,6 @@ namespace Features.Spawning
         private BattlefieldConfig _config;
 
         private int _nextCornerIndex = 0;
-        private bool _spawned;
 
         private Tank _player;
         private readonly List<Tank> _enemies = new(32);
@@ -40,14 +39,8 @@ namespace Features.Spawning
             _scorePopupService = scorePopupService;
         }
 
-        public void SpawnAll()
+        public void SpawnNewGame()
         {
-            if (_spawned)
-            {
-                return;
-            }
-
-            _spawned = true;
             _nextCornerIndex = 0;
 
             SpawnPlayerNewGame();
@@ -203,8 +196,6 @@ namespace Features.Spawning
                 }
             }
             _enemies.Clear();
-
-            _spawned = false;
             _nextCornerIndex = 0;
         }
 

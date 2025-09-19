@@ -99,7 +99,7 @@ namespace UI.Menu
             }
             else
             {
-                Spawner?.SpawnAll();
+                Spawner?.SpawnNewGame();
             }
             PowerUps?.StartSpawning();
             for (int t = countdownSeconds; t >= 1; t--)
