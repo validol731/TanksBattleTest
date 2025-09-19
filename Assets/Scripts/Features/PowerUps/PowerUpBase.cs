@@ -11,6 +11,7 @@ namespace Features.PowerUps
     [RequireComponent(typeof(Collider2D))]
     public abstract class PowerUpBase : MonoBehaviour, IPowerUpEffect
     {
+        [SerializeField] public string id;
         [SerializeField] private int aiPriority = 0;
         [SerializeField] private int scoreOnPickup = 50;
 

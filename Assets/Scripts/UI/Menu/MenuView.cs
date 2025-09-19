@@ -1,45 +1,47 @@
-﻿using Features.Score;
+﻿using Features.GameSave;
+using Features.PowerUps;
+using Features.Score;
+using Features.Spawning;
 using UniRx;
 using UnityEngine;
+using VContainer;
 
 namespace UI.Menu
 {
     public abstract class MenuView : MonoBehaviour
     {
         [Header("Visual Root")]
-        [SerializeField] protected RectTransform canvasRectTransform;
         [SerializeField] private CanvasGroup canvasGroup;
 
         protected abstract GameMenuType Type { get; }
 
         protected GameMenusController Controller;
+        protected IGameSaveService Save;
         protected IScoreService Score;
+        protected BattlefieldSpawner Spawner;
+        protected PowerUpSpawner PowerUps;
+
         private CompositeDisposable _cd = new();
 
         private bool _isVisible;
-      
 
-        private void OnEnable()
+        [Inject]
+        public void Construct(GameMenusController controller, IGameSaveService save, IScoreService score, BattlefieldSpawner spawner, PowerUpSpawner powerUps)
         {
-            if (Controller == null)
-            {
-                Controller = FindObjectOfType<GameMenusController>();
-            }
+            Save = save;
+            Spawner = spawner;
+            PowerUps = powerUps;
+            Score = score;
+            Controller = controller;
             Subscribe();
         }
-
         private void OnDisable()
         {
             _cd.Dispose();
         }
 
-        protected void Subscribe()
+        private void Subscribe()
         {
-            if (Controller == null)
-            {
-                return;
-            }
-
             _cd.Dispose();
             _cd = new CompositeDisposable();
 

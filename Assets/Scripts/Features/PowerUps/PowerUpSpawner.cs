@@ -104,7 +104,7 @@ namespace Features.PowerUps
                             continue;
                         }
 
-                        SpawnOne(entry, pos);
+                        SpawnPowerUp(entry, pos);
                         break;
                     }
                 }
@@ -119,7 +119,11 @@ namespace Features.PowerUps
             }
         }
 
-        private void SpawnOne(PowerUpEntry entry, Vector2 position)
+        public List<PowerUpBase> GetSpawned()
+        {
+            return _aliveInstances;
+        }
+        public void SpawnPowerUp(PowerUpEntry entry, Vector2 position)
         {
             PowerUpBase instance = Instantiate(entry.prefab, position, Quaternion.identity);
             _resolver.InjectGameObject(instance.gameObject);
@@ -133,6 +137,7 @@ namespace Features.PowerUps
             }
             _alivePerEntry[entry] += 1;
         }
+        
 
         private void OnCollected(PowerUpEntry entry, PowerUpBase instance)
         {
@@ -321,5 +326,6 @@ namespace Features.PowerUps
                 _alivePerEntry[keys[i]] = 0;
             }
         }
+
     }
 }

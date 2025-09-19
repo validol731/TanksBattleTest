@@ -20,7 +20,7 @@ namespace Features.Combat.WeaponEntities
                 prefab = config.enemyBulletPrefab;
             }
             _pool = new ObjectPool<Bullet>(
-                () => GameObject.Instantiate(prefab).GetComponent<Bullet>(),
+                () => Object.Instantiate(prefab).GetComponent<Bullet>(),
                 b => b.gameObject.SetActive(true),
                 b => b.gameObject.SetActive(false),
                 defaultCapacity: 16);

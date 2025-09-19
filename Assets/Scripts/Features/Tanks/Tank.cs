@@ -30,7 +30,9 @@ namespace Features.Tanks
         public int MaxHp => _config.maxHp;
         public float RespawnDelay => _config.respawnDelay;
         private bool IsEnemy => _config.IsEnemy;
-        private int _weaponLevelIndex = 0;
+        public int CurrentHp => _state.Hp.Value;
+        public TankConfig Config => _config;
+        public int WeaponLevelIndex => _state.WeaponLevelIndex.Value;
         public int ScoreOnKill
         {
             get
@@ -44,6 +46,8 @@ namespace Features.Tanks
                 return 0;
             }
         }
+
+
 
         [Inject]
         public void Construct(IMovementController movementController, IWeaponFactory weaponFactory)
@@ -77,14 +81,19 @@ namespace Features.Tanks
                 return;
             }
 
-            _state = new TankState(_config.maxHp);
+            _state = new TankState(_config.maxHp, 0);
             _movementController.Setup(_rigidbody2D, _config);
-            BuildWeaponFromSlot();
+            RebuildWeapon();
         }
 
-        private void BuildWeaponFromSlot()
+        private void RebuildWeapon()
         {
-            _weapon = _weaponFactory.Build(_config.weaponConfig, _weaponLevelIndex, _config.IsEnemy);
+            if (_config.weaponConfig == null)
+            {
+                _weapon = null;
+                return;
+            }
+            _weapon = _weaponFactory.Build(_config.weaponConfig, _state.WeaponLevelIndex.Value, _config.IsEnemy);
         }
 
         public void ResetForRespawn()
@@ -125,13 +134,13 @@ namespace Features.Tanks
                 return false;
             }
             int max = _config.weaponConfig.levels.Count - 1;
-            return _weaponLevelIndex < max;
+            return _state.WeaponLevelIndex.Value < max;
         }
 
         public void UpgradeWeapon()
         {
-            _weaponLevelIndex += 1;
-            BuildWeaponFromSlot();
+            _state.WeaponLevelIndex.Value += 1;
+            RebuildWeapon();
         }
         private void OnCollisionEnter2D(Collision2D c)
         {
@@ -157,7 +166,7 @@ namespace Features.Tanks
             if (_state.Hp.Value <= 0)
             {
                 _state.IsAlive.Value = false;
-                _weaponLevelIndex = 0;
+                _state.WeaponLevelIndex.Value = 0;
                 _diedSubject.OnNext(this);
                 gameObject.SetActive(false);
             }
@@ -166,6 +175,34 @@ namespace Features.Tanks
         private void Update()
         {
             TickWeapon(Time.deltaTime);
+        }
+
+        public void SetWeaponLevel(int level)
+        {
+            int max = _config.weaponConfig != null ? _config.weaponConfig.levels.Count - 1 : 0;
+            _state.WeaponLevelIndex.Value = Mathf.Clamp(level, 0, max);
+            RebuildWeapon();
+        }
+        public void SetHp(int hp)
+        {
+            if (_state == null)
+            {
+                return;
+            }
+            _state.Hp.Value = Mathf.Clamp(hp, 0, _config.maxHp);
+            if (_state.Hp.Value <= 0)
+            {
+                _state.IsAlive.Value = false;
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                _state.IsAlive.Value = true;
+                if (gameObject.activeSelf == false)
+                {
+                    gameObject.SetActive(true);
+                }
+            }
         }
     }
 }

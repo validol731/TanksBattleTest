@@ -22,6 +22,7 @@ namespace Features.PowerUps.Config
     [Serializable]
     public class PowerUpEntry
     {
+        public string id;
         public PowerUpBase prefab;
         
         [Header("Limits")] 

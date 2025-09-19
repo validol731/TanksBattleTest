@@ -1,12 +1,11 @@
-﻿using Features.Score;
+﻿using Cysharp.Threading.Tasks;
 using UI.Score;
 using UnityEngine;
 using UnityEngine.UI;
-using VContainer;
 
 namespace UI.Menu
 {
-    public class GameMenuUI : MenuView, IScorePopupService
+    public class GameMenuUI : MenuView
     {
         protected override GameMenuType Type => GameMenuType.Game;
 
@@ -14,18 +13,10 @@ namespace UI.Menu
         [SerializeField] private BestScoreLabel bestScoreLabel;
         [SerializeField] private ScoreLabel scoreLabel;
         
-        [Header("Score Popup")]
-        [SerializeField] private ScorePopupUI popupUiPrefab;
-        [SerializeField] private RectTransform popupWorldRoot; 
-
-        [Inject]
-        public void BaseConstruct(GameMenusController controller, IScoreService score)
-        {
-            Controller = controller;
-            Score = score;
-            Subscribe();
-        }
-        private void Awake()
+        private bool _isInProcess = false;
+        
+        
+        private void Start()
         {
             exitButton.onClick.AddListener(OnExitClicked);
             bestScoreLabel.Initialize(Score);
@@ -40,21 +31,25 @@ namespace UI.Menu
 
         private void OnExitClicked()
         {
-            Controller?.SetMenu(GameMenuType.MainMenu);
+            SaveAnExit().Forget();
         }
 
-        public void Show(int amount, Vector3 worldPos, Color color)
+        private async UniTask SaveAnExit()
         {
-            if (popupUiPrefab == null || popupWorldRoot == null)
+            //todo loading overlay
+            if (_isInProcess)
             {
-                Debug.LogWarning("[GameMenuUI] popupPrefabUI/popupWorldRoot not set");
                 return;
             }
-            
-            var inst = Instantiate(popupUiPrefab, popupWorldRoot);
-            Vector2 screen = Camera.main.WorldToScreenPoint(worldPos);
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(popupWorldRoot, screen, Camera.main, out var local);
-            inst.Play(amount, color,local);
+            _isInProcess = true;
+            await Save.SaveAsync();
+            Spawner.DespawnAll();
+            PowerUps.StopSpawning();
+            PowerUps.DespawnAllPowerUps();
+            Controller?.SetMenu(GameMenuType.MainMenu);
+            _isInProcess = false;
         }
+        
+        
     }
 }

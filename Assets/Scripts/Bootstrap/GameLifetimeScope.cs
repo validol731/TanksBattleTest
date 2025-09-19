@@ -1,12 +1,12 @@
 using Configs;
 using Features.AI;
 using Features.Combat;
+using Features.GameSave;
 using Features.Movement;
 using Features.Player;
 using Features.PowerUps;
 using Features.Score;
 using Features.Spawning;
-using UI;
 using UI.Menu;
 using UI.Score;
 using UnityEngine;
@@ -27,7 +27,7 @@ namespace Bootstrap
             }
 
             builder.Register<IMovementController, SteeringMovement>(Lifetime.Transient);
-            builder.RegisterComponentInHierarchy<GameMenuUI>().As<IScorePopupService>();
+            builder.RegisterComponentInHierarchy<ScorePopupView>().As<IScorePopupService>();
             builder.Register<ScoreService>(Lifetime.Singleton).As<IScoreService>();
             builder.Register<IAIController, SimpleAI>(Lifetime.Transient);
             builder.Register<IWeaponFactory, WeaponFactory>(Lifetime.Singleton);
@@ -37,15 +37,11 @@ namespace Bootstrap
             builder.Register<IPlayerController, PlayerController>(Lifetime.Transient);
             builder.RegisterComponentInHierarchy<BattlefieldSpawner>();
             builder.RegisterComponentInHierarchy<PowerUpSpawner>();
+            builder.Register<IGameSaveService, GameSaveService>(Lifetime.Transient);
             
-            builder.RegisterComponentInHierarchy<GameMenusController>();
-            builder.RegisterBuildCallback(container =>
-            {
-                foreach (var view in FindObjectsOfType<MenuView>(true))
-                {
-                    container.Inject(view);
-                }
-            });
+            builder.RegisterComponentInHierarchy<GameMenusController>();    
+            builder.RegisterComponentInHierarchy<MainMenuUI>().AsSelf().AsImplementedInterfaces();
+            builder.RegisterComponentInHierarchy<GameMenuUI>().AsSelf().AsImplementedInterfaces();
             builder.RegisterEntryPoint<GameLoop>();
         }
     }

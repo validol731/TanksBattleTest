@@ -18,12 +18,14 @@ MonoBehaviour:
   minDistanceFromPlayer: 4
   minDistanceBetweenPowerUps: 1.25
   items:
-  - prefab: {fileID: 8908581651245439188, guid: b0f474a0b9bc52b4393dbe8d1a387db0, type: 3}
+  - id: heal_powerup
+    prefab: {fileID: 8908581651245439188, guid: b0f474a0b9bc52b4393dbe8d1a387db0, type: 3}
     maxOnField: 3
     spawnAttemptChance: 0.5
     allowPlayerPickup: 1
     allowEnemyPickup: 1
-  - prefab: {fileID: 4035206664802827353, guid: f2f6619017c0b31438ca59bf7e338d56, type: 3}
+  - id: weapon_levelup_powerup
+    prefab: {fileID: 4035206664802827353, guid: f2f6619017c0b31438ca59bf7e338d56, type: 3}
     maxOnField: 1
     spawnAttemptChance: 0.25
     allowPlayerPickup: 1

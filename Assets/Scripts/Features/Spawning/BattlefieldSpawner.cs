@@ -7,6 +7,7 @@ using Configs;
 using Features.Tanks;
 using Features.Tanks.Config;
 using Features.AI;
+using Features.AI.Config;
 using Features.Player;
 using Features.Score;
 using UI.Score;
@@ -49,32 +50,27 @@ namespace Features.Spawning
             _spawned = true;
             _nextCornerIndex = 0;
 
-            SpawnPlayer();
-            SpawnEnemiesFromPacks();
+            SpawnPlayerNewGame();
+            SpawnEnemiesNewGame();
         }
 
-        private void SpawnPlayer()
+        public void SpawnPlayerNewGame()
         {
             TankConfig playerConfig = _config.playerConfig;
-            if (playerConfig == null)
-            {
-                Debug.LogError("[BattlefieldSpawner] PlayerConfig is null.");
-                return;
-            }
-            if (_config.playerTankPrefab == null)
-            {
-                Debug.LogError("[BattlefieldSpawner] playerTankPrefab is null.");
-                return;
-            }
-
             Vector2 position = CornerByIndex(_nextCornerIndex);
             Quaternion rotation = Quaternion.identity;
+            SpawnPlayer(playerConfig, position, rotation, playerConfig.maxHp, 0);
+        }
 
+        public void SpawnPlayer(TankConfig playerConfig, Vector2 position, Quaternion rotation, int hp, int weaponLevel)
+        {
             Tank player = Instantiate(_config.playerTankPrefab, position, rotation);
             player.gameObject.tag = "Player";
 
             _resolver.InjectGameObject(player.gameObject);
             player.Initialize(playerConfig);
+            player.SetHp(hp);
+            player.SetWeaponLevel(weaponLevel);
 
             PlayerControllerHost host = player.gameObject.AddComponent<PlayerControllerHost>();
             _resolver.Inject(host);
@@ -113,7 +109,7 @@ namespace Features.Spawning
             RespawnAfterDelay(player, bestCorner).Forget();
         }
 
-        private void SpawnEnemiesFromPacks()
+        private void SpawnEnemiesNewGame()
         {
             if (_config.enemies == null || _config.enemies.Count == 0)
             {
@@ -142,32 +138,34 @@ namespace Features.Spawning
                 {
                     Vector2 position = FindBorderPointSafe(_minSpawnDistanceFromPlayer, _minSpawnDistanceFromEnemies, 32);
                     Quaternion rotation = Quaternion.identity;
-
-                    Tank prefab = _config.enemyTankPrefab;
-                    if (prefab == null)
-                    {
-                        Debug.LogError("[BattlefieldSpawner] Enemy prefab is null.");
-                        return;
-                    }
-
-                    Tank enemy = Instantiate(prefab, position, rotation);
-                    _resolver.InjectGameObject(enemy.gameObject);
-                    enemy.Initialize(pack.tankConfig);
-
-                    Vector2 toCenter = (_config.mapCenter - position).normalized;
-                    float headingDegrees = Mathf.Atan2(toCenter.y, toCenter.x) * Mathf.Rad2Deg;
-                    enemy.transform.rotation = Quaternion.Euler(0f, 0f, headingDegrees);
-
-                    EnemyAIHost host = enemy.gameObject.AddComponent<EnemyAIHost>();
-                    _resolver.Inject(host);
-                    host.SetProfile(pack.tankConfig);
-
-                    enemy.Died.Subscribe(OnEnemyDie).AddTo(enemy);
-                    _enemies.Add(enemy);
+                    var config = pack.tankConfig;
+                    SpawnEnemy(config, position, rotation, config.maxHp, 0);
                 }
             }
         }
 
+
+        public void SpawnEnemy(AITankConfig config, Vector2 position, Quaternion rotation, int hp, int weaponLevel)
+        {
+            Tank prefab = _config.enemyTankPrefab;
+            Tank enemy = Instantiate(prefab, position, rotation);
+            _resolver.InjectGameObject(enemy.gameObject);
+            enemy.Initialize(config);
+            enemy.SetHp(hp);
+            enemy.SetWeaponLevel(weaponLevel);
+
+            Vector2 toCenter = (_config.mapCenter - position).normalized;
+            float headingDegrees = Mathf.Atan2(toCenter.y, toCenter.x) * Mathf.Rad2Deg;
+            enemy.transform.rotation = Quaternion.Euler(0f, 0f, headingDegrees);
+
+            EnemyAIHost host = enemy.gameObject.AddComponent<EnemyAIHost>();
+            _resolver.Inject(host);
+            host.SetProfile(config);
+
+            enemy.Died.Subscribe(OnEnemyDie).AddTo(enemy);
+            _enemies.Add(enemy);
+        }
+        
         private void OnEnemyDie(Tank enemy)
         {
             if (_score != null)
@@ -179,6 +177,15 @@ namespace Features.Spawning
             RespawnAfterDelay(enemy, newPosition).Forget();
         }
         
+        
+        public List<Tank> GetEnemies()
+        {
+            return _enemies;
+        }
+        public Tank GetPlayer()
+        {
+            return _player;
+        }
         public void DespawnAll()
         {
             if (_player != null)
@@ -368,5 +375,6 @@ namespace Features.Spawning
                 return new Vector2(max.x, max.y);
             }
         }
+
     }
 }

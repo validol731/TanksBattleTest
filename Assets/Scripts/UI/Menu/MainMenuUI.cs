@@ -1,13 +1,10 @@
 ﻿using Cysharp.Threading.Tasks;
-using Features.PowerUps;
-using Features.Score;
-using Features.Spawning;
+using Features.GameSave;
 using TMPro;
 using UI.Score;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
-using VContainer;
 
 namespace UI.Menu
 {
@@ -16,7 +13,8 @@ namespace UI.Menu
         protected override GameMenuType Type => GameMenuType.MainMenu;
 
         [Header("UI")]
-        [SerializeField] private Button startButton;
+        [SerializeField] private Button newStartButton;
+        [SerializeField] private Button continueButton;
         [SerializeField] private TMP_Text countdownText;
         [SerializeField] private BestScoreLabel bestScoreLabel;
 
@@ -26,32 +24,19 @@ namespace UI.Menu
         [Header("PostProcessing (optional)")]
         [SerializeField] private Volume blurVolume;
 
-        private BattlefieldSpawner _spawner;
-        private PowerUpSpawner _powerUps;
-
         private bool _starting;
+        private GameSaveData _saveData;
 
-        [Inject]
-        public void Construct(GameMenusController controller, IScoreService score, BattlefieldSpawner spawner, PowerUpSpawner powerUps)
+        private void Start()
         {
-            _spawner = spawner;
-            _powerUps = powerUps;
-            Score = score;
-            Controller = controller;
-        }
-
-        private void Awake()
-        {
-            countdownText.gameObject.SetActive(false);
-            startButton.gameObject.SetActive(true);
-            bestScoreLabel.gameObject.SetActive(true);
-            startButton.onClick.AddListener(OnStartClicked);
-            bestScoreLabel.Initialize(Score);
+            newStartButton.onClick.AddListener(OnStartClicked);
+            continueButton.onClick.AddListener(OnContinueClicked);
         }
 
         private void OnDestroy()
         {
-            startButton.onClick.RemoveListener(OnStartClicked);
+            newStartButton.onClick.RemoveListener(OnStartClicked);
+            continueButton.onClick.RemoveListener(OnContinueClicked);
         }
 
         protected override void OnShown()
@@ -60,13 +45,14 @@ namespace UI.Menu
             {
                 blurVolume.enabled = true;
             }
+
+            bestScoreLabel.Initialize(Score);
+            _saveData = Save.TryGetSaveData();
             Time.timeScale = 0f;
-            startButton.gameObject.SetActive(true);
+            newStartButton.gameObject.SetActive(true);
+            continueButton.gameObject.SetActive(_saveData != null);
             bestScoreLabel.ChangeState(true);
 
-            _powerUps?.StopSpawning();
-            _powerUps?.DespawnAllPowerUps();
-            _spawner?.DespawnAll();
             Score?.ResetRun();
         }
 
@@ -87,17 +73,35 @@ namespace UI.Menu
             }
 
             _starting = true;
-            StartFlow().Forget();
+            StartFlow(false).Forget();
+        }
+        private void OnContinueClicked()
+        {
+            if (_starting)
+            {
+                return;
+            }
+
+            _starting = true;
+            StartFlow(true).Forget();
         }
 
-        private async UniTaskVoid StartFlow()
+        private async UniTaskVoid StartFlow(bool loadData)
         {
-            _spawner?.SpawnAll();
-            _powerUps?.StartSpawning();
-            startButton.gameObject.SetActive(false);
+            newStartButton.gameObject.SetActive(false);
+            continueButton.gameObject.SetActive(false);
             bestScoreLabel.ChangeState(false);
 
             countdownText.gameObject.SetActive(true);
+            if (loadData && _saveData != null)
+            {
+                Save.LoadAsync(_saveData).Forget();
+            }
+            else
+            {
+                Spawner?.SpawnAll();
+            }
+            PowerUps?.StartSpawning();
             for (int t = countdownSeconds; t >= 1; t--)
             {
                 countdownText.text = t.ToString();

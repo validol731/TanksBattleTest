@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 569e1be0827d4b8688e75844729a9c85, type: 3}
   m_Name: AITankConfig_Medium
   m_EditorClassIdentifier: 
+  id: ai_medium
   image: {fileID: 21300000, guid: f3683a5550131f24690117ea6a252045, type: 3}
   maxHp: 3
   respawnDelay: 3
@@ -27,3 +28,4 @@ MonoBehaviour:
   lootPriorityBias: 2
   randomizePercent: 0.1
   lootPriorityJitter: 1
+  scoreOnKill: 100
