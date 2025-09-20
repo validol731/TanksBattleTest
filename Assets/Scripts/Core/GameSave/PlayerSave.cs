@@ -1,10 +1,10 @@
 ﻿using System;
 using Configs;
-using Features.AI;
+using Features.GameSave;
 using Features.Spawning;
 using UnityEngine;
 
-namespace Features.GameSave
+namespace Core.GameSave
 {
     [Serializable]
     public class PlayerSave

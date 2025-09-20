@@ -50,8 +50,6 @@ namespace UI.Menu
             newStartButton.gameObject.SetActive(true);
             continueButton.gameObject.SetActive(_saveData != null);
             bestScoreLabel.ChangeState(true);
-
-            Score?.ResetRun();
         }
 
         protected override void OnHidden()
@@ -94,6 +92,7 @@ namespace UI.Menu
             }
             else
             {
+                Score?.ResetRun();
                 Spawner?.SpawnNewGame();
             }
             PowerUps?.StartSpawning();
