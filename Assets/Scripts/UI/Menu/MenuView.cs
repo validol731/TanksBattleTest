@@ -1,4 +1,6 @@
-﻿using Features.GameSave;
+﻿using System;
+using Core.Audio;
+using Features.GameSave;
 using Features.PowerUps;
 using Features.Score;
 using Features.Spawning;
@@ -12,6 +14,9 @@ namespace UI.Menu
     {
         [Header("Visual Root")]
         [SerializeField] private CanvasGroup canvasGroup;
+
+        [SerializeField] private AudioClip audioClick;
+        [SerializeField] private AudioClip[] audioMenuMusic;
 
         protected abstract GameMenuType Type { get; }
 
@@ -33,12 +38,23 @@ namespace UI.Menu
             PowerUps = powerUps;
             Score = score;
             Controller = controller;
+        }
+
+        private void Awake()
+        {
             Subscribe();
         }
+
         private void OnDisable()
         {
             _cd.Dispose();
         }
+
+        public void PlayButtonClick()
+        {
+            AudioManager.Instance.PlayUI(audioClick);
+        }
+
 
         private void Subscribe()
         {
@@ -83,7 +99,11 @@ namespace UI.Menu
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
         }
-        protected virtual void OnShown() { }
+
+        protected virtual void OnShown()
+        {
+            AudioManager.Instance.PlayMusicList(audioMenuMusic);
+        }
         protected virtual void OnHidden() { }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Core.Audio;
+using Cysharp.Threading.Tasks;
 using Features.GameSave;
 using TMPro;
 using UI.Score;
@@ -17,6 +18,7 @@ namespace UI.Menu
         [SerializeField] private Button continueButton;
         [SerializeField] private TMP_Text countdownText;
         [SerializeField] private BestScoreLabel bestScoreLabel;
+        [SerializeField] private AudioClip timerAudio;
 
         [Header("Countdown")]
         [SerializeField] private int countdownSeconds = 3;
@@ -41,6 +43,7 @@ namespace UI.Menu
 
         protected override void OnShown()
         {
+            base.OnShown();
             if (blurVolume != null)
             {
                 blurVolume.enabled = true;
@@ -102,6 +105,7 @@ namespace UI.Menu
                 Spawner?.SpawnNewGame();
             }
             PowerUps?.StartSpawning();
+            AudioManager.Instance.PlayUI(timerAudio);
             for (int t = countdownSeconds; t >= 1; t--)
             {
                 countdownText.text = t.ToString();

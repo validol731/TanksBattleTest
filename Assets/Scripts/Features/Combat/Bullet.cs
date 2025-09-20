@@ -1,3 +1,4 @@
+using Core.Audio;
 using Features.Tanks;
 using UnityEngine;
 
@@ -8,6 +9,9 @@ namespace Features.Combat
     {
         private Rigidbody2D _rigidbody;
         private System.Action _onDone;
+        [SerializeField] private AudioClip onDestroyAudio;
+        [SerializeField] private GameObject tailObj;
+        [SerializeField] private GameObject onDestroyParticleObj;
         private int _damage;
 
         private void Awake()
@@ -22,6 +26,7 @@ namespace Features.Combat
             transform.position = pos;
             transform.rotation = Quaternion.Euler(0,0, headingRad * Mathf.Rad2Deg);
             _rigidbody.velocity = new Vector2(Mathf.Cos(headingRad), Mathf.Sin(headingRad)) * speed;
+            tailObj.gameObject.SetActive(true);
         }
 
         private void OnCollisionEnter2D(Collision2D c)
@@ -31,6 +36,9 @@ namespace Features.Combat
                 d.TakeHit(_damage);
             }
             _onDone?.Invoke();
+            AudioManager.Instance.PlaySfx(onDestroyAudio);
+            tailObj.gameObject.SetActive(false);
+            Instantiate(onDestroyParticleObj, transform.position, Quaternion.identity, transform.parent);
         }
     }
 }

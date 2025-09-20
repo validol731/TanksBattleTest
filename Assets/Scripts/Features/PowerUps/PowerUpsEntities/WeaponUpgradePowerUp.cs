@@ -14,6 +14,7 @@ namespace Features.PowerUps.PowerUpsEntities
         }
         public override void Apply(Tank target)
         {
+            base.Apply(target);
             target.UpgradeWeapon();
         }
     }

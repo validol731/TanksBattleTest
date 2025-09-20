@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Audio;
 using Features.PowerUps.Config;
 using Features.Score;
 using UniRx;
@@ -12,6 +13,8 @@ namespace Features.PowerUps
     [RequireComponent(typeof(Collider2D))]
     public abstract class PowerUpBase : MonoBehaviour, IPowerUpEffect
     {
+        [SerializeField] private AudioClip onPowerUpSpawn;
+        [SerializeField] private AudioClip onPowerUpPickup;
         [SerializeField] private int aiPriority = 0;
         [SerializeField] private int scoreOnPickup = 50;
 
@@ -32,6 +35,7 @@ namespace Features.PowerUps
         public void Initialize(PowerUpEntry config)
         {
             currentConfig = config;
+            AudioManager.Instance.PlaySfx(onPowerUpSpawn);
         }
         [Inject]
         public void Construct(IScoreService score, IScorePopupService scorePopupService)
@@ -140,6 +144,10 @@ namespace Features.PowerUps
         }
 
         public abstract bool CanConsume(Tank target);
-        public abstract void Apply(Tank target);
+
+        public virtual void Apply(Tank target)
+        {
+            AudioManager.Instance.PlaySfx(onPowerUpPickup);
+        }
     }
 }

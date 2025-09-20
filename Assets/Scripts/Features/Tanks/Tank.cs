@@ -1,4 +1,5 @@
 using System;
+using Core.Audio;
 using Features.AI.Config;
 using Features.Combat;
 using Features.Movement;
@@ -14,6 +15,8 @@ namespace Features.Tanks
     public class Tank : MonoBehaviour, IDamageable
     {
         [SerializeField] private SpriteRenderer image;
+        [SerializeField] private AudioClip onDestroyAudio;
+        [SerializeField] private AudioClip onShotAudio;
         [SerializeField] private HeartsView2D heartsView2D;
         
         private TankConfig _config;
@@ -101,6 +104,7 @@ namespace Features.Tanks
             _state.Hp.Value = _config.maxHp;
             _state.IsAlive.Value = true;
             gameObject.SetActive(true);
+            RebuildWeapon();
         }
 
         public void TryFire()
@@ -110,7 +114,10 @@ namespace Features.Tanks
                 return;
             }
 
-            _weapon.TryFire(transform.position, _movementController.CurrentHeadingRad);
+            if (_weapon.TryFire(transform.position, _movementController.CurrentHeadingRad))
+            {
+                AudioManager.Instance.PlaySfx(onShotAudio);
+            }
         }
 
         public void TickWeapon(float deltaTime)
@@ -169,6 +176,7 @@ namespace Features.Tanks
                 _state.WeaponLevelIndex.Value = 0;
                 _diedSubject.OnNext(this);
                 gameObject.SetActive(false);
+                AudioManager.Instance.PlaySfx(onDestroyAudio);
             }
         }
 

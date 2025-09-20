@@ -31,11 +31,11 @@ namespace Features.Combat.WeaponEntities
             _cooldown = Mathf.Max(0, _cooldown - dt);
         }
 
-        public void TryFire(Vector2 pos, float headingRad)
+        public bool TryFire(Vector2 pos, float headingRad)
         {
             if (_cooldown > 0f)
             {
-                return;
+                return false;
             }
             _cooldown = _config.cooldown;
 
@@ -57,15 +57,10 @@ namespace Features.Combat.WeaponEntities
                 float shotRadians = headingRad + spreadOffsetDegrees * Mathf.Deg2Rad;
                 var bullet = _pool.Get();
                 bullet.Launch(pos, shotRadians, _config.bulletSpeed, _config.damage, () => ReleaseBullet(bullet));
-                ReleaseBulletDelay(bullet).Forget();
             }
+            return true;
         }
 
-        private async UniTask ReleaseBulletDelay(Bullet bullet)
-        {
-            await UniTask.Delay((int)(_config.bulletLife * 1000));
-            ReleaseBullet(bullet);
-        }
         private void ReleaseBullet(Bullet bullet)
         {
             if (bullet.gameObject.activeSelf)

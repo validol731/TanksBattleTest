@@ -17,6 +17,7 @@ namespace Features.PowerUps.PowerUpsEntities
 
         public override void Apply(Tank target)
         {
+            base.Apply(target);
             int current = target.State.Hp.Value;
             int max = target.MaxHp;
             int newValue = current + healAmount;
