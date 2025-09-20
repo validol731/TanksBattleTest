@@ -17,14 +17,12 @@ namespace UI.Menu
         [SerializeField] private Button newStartButton;
         [SerializeField] private Button continueButton;
         [SerializeField] private TMP_Text countdownText;
+        [SerializeField] private TMP_Text titleText;
         [SerializeField] private BestScoreLabel bestScoreLabel;
         [SerializeField] private AudioClip timerAudio;
 
         [Header("Countdown")]
         [SerializeField] private int countdownSeconds = 3;
-
-        [Header("PostProcessing (optional)")]
-        [SerializeField] private Volume blurVolume;
 
         private bool _starting;
         private GameSaveData _saveData;
@@ -44,14 +42,11 @@ namespace UI.Menu
         protected override void OnShown()
         {
             base.OnShown();
-            if (blurVolume != null)
-            {
-                blurVolume.enabled = true;
-            }
-
             bestScoreLabel.Initialize(Score);
             _saveData = Save.TryGetSaveData();
             Time.timeScale = 0f;
+            countdownText.gameObject.SetActive(false);
+            titleText.gameObject.SetActive(true);
             newStartButton.gameObject.SetActive(true);
             continueButton.gameObject.SetActive(_saveData != null);
             bestScoreLabel.ChangeState(true);
@@ -61,10 +56,6 @@ namespace UI.Menu
 
         protected override void OnHidden()
         {
-            if (blurVolume != null)
-            {
-                blurVolume.enabled = false;
-            }
             Time.timeScale = 1f;
         }
 
@@ -114,6 +105,7 @@ namespace UI.Menu
             countdownText.text = "GO!";
             await UniTask.Delay(500, ignoreTimeScale: true);
             countdownText.gameObject.SetActive(false);
+            titleText.gameObject.SetActive(false);
 
             Controller?.SetMenu(GameMenuType.Game);
 
