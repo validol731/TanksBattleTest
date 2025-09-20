@@ -19,7 +19,7 @@ namespace Features.AI
 
         public static void SaveData(GameSaveData save, BattlefieldSpawner battlefieldSpawner)
         {
-            foreach (var enemy in battlefieldSpawner.GetEnemies().Where(x => x.CurrentHp > 0))
+            foreach (var enemy in battlefieldSpawner.GetEnemies())
             {
                 EnemySave es = new EnemySave();
                 es.position = enemy.transform.position;

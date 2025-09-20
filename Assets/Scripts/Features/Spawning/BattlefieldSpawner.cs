@@ -157,6 +157,12 @@ namespace Features.Spawning
 
             enemy.Died.Subscribe(OnEnemyDie).AddTo(enemy);
             _enemies.Add(enemy);
+
+            if (hp == 0)
+            {
+                Vector2 newPosition = FindBorderPointSafe(_minSpawnDistanceFromPlayer, _minSpawnDistanceFromEnemies, 32);
+                RespawnAfterDelay(enemy, newPosition).Forget();
+            }
         }
         
         private void OnEnemyDie(Tank enemy)
