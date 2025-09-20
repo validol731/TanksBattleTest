@@ -771,7 +771,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 0.8627451}
+  m_Color: {r: 0.2264151, g: 0.2264151, b: 0.2264151, a: 0.9647059}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1453,55 +1453,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0c282c976cb34464387dfda9a26b66c6, type: 3}
---- !u!1 &788395095
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 788395096}
-  - component: {fileID: 788395097}
-  m_Layer: 5
-  m_Name: Global Volume
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &788395096
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 788395095}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2081385434}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &788395097
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 788395095}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 172515602e62fb746b5d573b38a5fe58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_IsGlobal: 1
-  priority: 1
-  blendDistance: 0
-  weight: 1
-  sharedProfile: {fileID: 11400000, guid: 496d4e23857ccef4391fac36f91adf5e, type: 2}
 --- !u!1 &834009150
 GameObject:
   m_ObjectHideFlags: 0
@@ -3650,10 +3601,10 @@ MonoBehaviour:
   newStartButton: {fileID: 1481278560}
   continueButton: {fileID: 1089479835}
   countdownText: {fileID: 239560890}
+  titleText: {fileID: 1755888267}
   bestScoreLabel: {fileID: 2081385435}
   timerAudio: {fileID: 8300000, guid: 0f4127d9cdb356f4ba035332f15e681a, type: 3}
   countdownSeconds: 3
-  blurVolume: {fileID: 788395097}
 --- !u!114 &2081385431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3729,13 +3680,12 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 788395096}
   - {fileID: 431272190}
+  - {fileID: 1755888266}
   - {fileID: 1481278563}
   - {fileID: 1089479838}
   - {fileID: 239560892}
   - {fileID: 2053704922}
-  - {fileID: 1755888266}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

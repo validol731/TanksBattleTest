@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Configs;
 using Features.AI.Config;
 using Features.GameSave;
@@ -18,7 +19,7 @@ namespace Features.AI
 
         public static void SaveData(GameSaveData save, BattlefieldSpawner battlefieldSpawner)
         {
-            foreach (var enemy in battlefieldSpawner.GetEnemies())
+            foreach (var enemy in battlefieldSpawner.GetEnemies().Where(x => x.CurrentHp > 0))
             {
                 EnemySave es = new EnemySave();
                 es.position = enemy.transform.position;

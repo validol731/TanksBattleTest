@@ -28,8 +28,15 @@ namespace Features.GameSave
         public static void ApplySave(BattlefieldSpawner battlefieldSpawner, BattlefieldConfig battlefieldConfig, GameSaveData data)
         {
             var player = data.Player;
-            Quaternion rot = Quaternion.Euler(0f, 0f, player.rotationZ);
-            battlefieldSpawner.SpawnPlayer(battlefieldConfig.playerConfig, player.position, rot, player.hp, player.weaponLevel);
+            if (player.hp == 0)
+            {
+                battlefieldSpawner.SpawnPlayerNewGame();
+            }
+            else
+            {
+                Quaternion rot = Quaternion.Euler(0f, 0f, player.rotationZ);
+                battlefieldSpawner.SpawnPlayer(battlefieldConfig.playerConfig, player.position, rot, player.hp, player.weaponLevel);   
+            }
         }
     }
 }

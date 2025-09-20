@@ -85,6 +85,7 @@ namespace UI.Menu
             newStartButton.gameObject.SetActive(false);
             continueButton.gameObject.SetActive(false);
             bestScoreLabel.ChangeState(false);
+            titleText.gameObject.SetActive(false);
 
             countdownText.gameObject.SetActive(true);
             if (loadData && _saveData != null)
@@ -105,7 +106,6 @@ namespace UI.Menu
             countdownText.text = "GO!";
             await UniTask.Delay(500, ignoreTimeScale: true);
             countdownText.gameObject.SetActive(false);
-            titleText.gameObject.SetActive(false);
 
             Controller?.SetMenu(GameMenuType.Game);
 
